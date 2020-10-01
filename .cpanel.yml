@@ -1,0 +1,7 @@
+deployment:
+
+ tasks:
+
+ - export DEPLOYPATH=/home/ublearni/dkjps-api 
+
+ - /usr/bin/rsync -Paz * $DEPLOYPATH --delete
