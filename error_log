@@ -1,0 +1,1 @@
+[03-Sep-2020 11:51:48 Asia/Jakarta] PHP Fatal error:  Cannot redeclare GeneralApiModel::getWhereTransactionalOrdered() in /home/ublearni/api.mhscourses.ub-learningtechnology.com/application/models/GeneralApiModel.php on line 105
