@@ -139,7 +139,7 @@ class SkriningApiController extends REST_Controller {
 
       // KASUS SUSPEK
       $empat_a_c = array(51,53,55);
-      if ((count(array_intersect($id_jawaban, $a_h)) > 0) && (count(array_intersect($id_jawaban, $a_h)) > 0)) {
+      if ((count(array_intersect($id_jawaban, $empat_a_c)) > 0) && (count(array_intersect($id_jawaban, $a_h)) > 0)) {
         $fisik = 4;
       }
 

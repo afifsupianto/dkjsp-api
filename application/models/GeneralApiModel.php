@@ -19,7 +19,7 @@ class GeneralApiModel extends CI_Model {
         $query = $db->get_where($tabel, $data);
         return $query;
     }
-    
+
     function getWhereMasterOrdered($data, $title, $order,$tabel){
         $db = $this->load->database('mhsc_masterdata', TRUE);
         $query = $db->from($tabel)->where($data)->order_by($title, $order)->get();
@@ -33,7 +33,7 @@ class GeneralApiModel extends CI_Model {
         $db->insert($tabel, $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -52,7 +52,7 @@ class GeneralApiModel extends CI_Model {
         //$db->insert('masterdata_Pelatihan', $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -70,7 +70,7 @@ class GeneralApiModel extends CI_Model {
         $db->delete($tabel, $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -101,7 +101,7 @@ class GeneralApiModel extends CI_Model {
         $query = $db->get_where($tabel, $data);
         return $query;
     }
-    
+
     function getWhereTransactionalOrdered($data, $title, $order,$tabel){
         $db = $this->load->database('mhsc_transactional', TRUE);
         $query = $db->from($tabel)->where($data)->order_by($title, $order)->get();
@@ -115,7 +115,7 @@ class GeneralApiModel extends CI_Model {
         $db->insert($tabel, $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -124,7 +124,7 @@ class GeneralApiModel extends CI_Model {
         }
         return $status;
     }
-    
+
     function insertIdTransactional($data, $tabel){
         $db = $this->load->database('mhsc_transactional', TRUE);
         $db->trans_begin();
@@ -132,7 +132,7 @@ class GeneralApiModel extends CI_Model {
         $db->insert($tabel, $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -140,10 +140,10 @@ class GeneralApiModel extends CI_Model {
             $insert_id = $db->insert_id();
             $db->trans_commit();
         }
-        
+
         return $insert_id;
     }
-    
+
     function insertBatchTransactional($data, $tabel){
         $db = $this->load->database('mhsc_transactional', TRUE);
         $db->trans_begin();
@@ -151,7 +151,7 @@ class GeneralApiModel extends CI_Model {
         $db->insert_batch($tabel, $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -170,7 +170,7 @@ class GeneralApiModel extends CI_Model {
         //$db->insert('masterdata_Pelatihan', $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }
@@ -188,7 +188,7 @@ class GeneralApiModel extends CI_Model {
         $db->delete($tabel, $data);
 
         $status = $db->trans_status();
-        
+
         if ($status === FALSE){
             $db->trans_rollback();
         }

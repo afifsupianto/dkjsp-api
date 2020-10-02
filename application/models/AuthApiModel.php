@@ -35,7 +35,7 @@ class AuthApiModel extends CI_Model{
                 $data3['id_user'] = $insert_id;
                 $this->db->insert('transactional_alamat', $data3);
                 $status = $this->db->trans_status();
-                
+
                 if($status === FALSE){
                     $this->db->trans_rollback();
                 }else{
@@ -45,7 +45,7 @@ class AuthApiModel extends CI_Model{
         }
         return $insert_id;
     }
-    
+
     function insertPanitia($data_user, $data_alamat){
         $this->db->trans_begin();
 
@@ -53,7 +53,7 @@ class AuthApiModel extends CI_Model{
         $id_user = $this->db->insert_id();
 
         $status = $this->db->trans_status();
-        
+
         if ($status === FALSE){
             $this->db->trans_rollback();
         }
@@ -61,7 +61,7 @@ class AuthApiModel extends CI_Model{
             $data_alamat['id_user'] = $id_user;
             $this->db->insert('transactional_alamat', $data_alamat);
             $status = $this->db->trans_status();
-            
+
             if($status === FALSE){
                 $this->db->trans_rollback();
             }
@@ -69,7 +69,7 @@ class AuthApiModel extends CI_Model{
                 $this->db->trans_commit();
             }
         }
-        
+
         return $id_user;
     }
 
@@ -80,14 +80,14 @@ class AuthApiModel extends CI_Model{
         $id_user = $this->db->insert_id();
 
         $status = $this->db->trans_status();
-        
+
         if ($status === FALSE){
             $this->db->trans_rollback();
         }
         else{
             $this->db->insert('transactional_keluargabinaan', $data_keluargabinaan);
             $status = $this->db->trans_status();
-            
+
             if($status === FALSE){
                 $this->db->trans_rollback();
             }
@@ -95,7 +95,7 @@ class AuthApiModel extends CI_Model{
                 $data_anggota['id_user'] = $id_user;
                 $this->db->insert('transactional_anggota_keluarga', $data_anggota);
                 $status = $this->db->trans_status();
-                
+
                 if($status === FALSE){
                     $this->db->trans_rollback();
                 }
@@ -122,7 +122,7 @@ class AuthApiModel extends CI_Model{
         $id_user = $this->db->insert_id();
 
         $status = $this->db->trans_status();
-        
+
         if ($status === FALSE){
             $this->db->trans_rollback();
         }
@@ -131,7 +131,7 @@ class AuthApiModel extends CI_Model{
             $this->db->insert('transactional_anggota_keluarga', $data_anggota);
 
             $status = $this->db->trans_status();
-            
+
             if($status === FALSE){
                 $this->db->trans_rollback();
             }
@@ -139,7 +139,7 @@ class AuthApiModel extends CI_Model{
                 $data_alamat['id_user'] = $id_user;
                 $this->db->insert('transactional_alamat', $data_alamat);
                 $status = $this->db->trans_status();
-                
+
                 if($status === FALSE){
                     $this->db->trans_rollback();
                 }
@@ -177,7 +177,7 @@ class AuthApiModel extends CI_Model{
             return false;
         }
     }
-    
+
     function getUser($data){
         $query = $this->db->get_where('user', $data);
         return $query;
@@ -216,7 +216,7 @@ class AuthApiModel extends CI_Model{
     // LEFT JOIN ublearni_mhscourses_masterdata.masterdata_provinsi c
     // ON b.id_provinsi = c.id_provinsi
     // LEFT JOIN ublearni_mhscourses_masterdata.masterdata_kota d
-    // ON b.id_kota = d.id_kota     
+    // ON b.id_kota = d.id_kota
     // WHERE a.role = 0
 
     // CREATE VIEW user_anggotakeluarga_detail AS
@@ -229,5 +229,5 @@ class AuthApiModel extends CI_Model{
     // LEFT JOIN ublearni_mhscourses_masterdata.masterdata_provinsi d
     // ON c.id_provinsi = d.id_provinsi
     // LEFT JOIN ublearni_mhscourses_masterdata.masterdata_kota e
-    // ON c.id_kota = e.id_kota     
+    // ON c.id_kota = e.id_kota
     // WHERE a.role = 1
