@@ -1,3 +1,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/ublearni/dkjps-api
+    - /bin/cp -R application $DEPLOYPATH
