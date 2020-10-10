@@ -75,7 +75,7 @@ $query_builder = TRUE;
 
 $db['mhsc_masterdata'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
+	'hostname' => 'ub-learningtechnology.com',
 	'username' => 'ublearni_mhsc_root',
 	'password' => 'r8rwtt3OZoho',
 	'database' => 'ublearni_mhscourses_masterdata',
@@ -117,7 +117,7 @@ $db['mhsc_masterdata'] = array(
 
 $db['mhsc_transactional'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
+	'hostname' => 'ub-learningtechnology.com',
 	'username' => 'ublearni_mhsc_root',
 	'password' => 'r8rwtt3OZoho',
 	'database' => 'ublearni_mhscourses_transactional',
