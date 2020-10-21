@@ -19,10 +19,12 @@ class AktivitasApiController extends REST_Controller {
       'id' => $this->input->post('id_user')
     );
 
+    $id_grading = $this->input->post('id_grading');
+
     if(!empty($user['id'])){
       $user = $this->GeneralApiModel->getWhereTransactional($user, "user_provinsi_kota")->row();
       if(!empty($user)){
-        $aktivitas = $this->GeneralApiModel->getWhereMaster(array('statusdata'=>0), "masterdata_aktivitas")->result();
+        $aktivitas = $this->GeneralApiModel->getWhereMaster(array('id_grading'=>$id_grading), "masterdata_aktivitas")->result();
 
         $list_aktivitas = array();
         $list_soal = array();

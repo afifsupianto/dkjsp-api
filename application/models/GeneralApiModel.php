@@ -108,6 +108,12 @@ class GeneralApiModel extends CI_Model {
         return $query;
     }
 
+    function getOneWhereTransactionalOrdered($data, $title, $order,$tabel){
+        $db = $this->load->database('mhsc_transactional', TRUE);
+        $query = $db->from($tabel)->where($data)->order_by($title, $order)->limit(1)->get();
+        return $query;
+    }
+
     function insertTransactional($data, $tabel){
         $db = $this->load->database('mhsc_transactional', TRUE);
         $db->trans_begin();

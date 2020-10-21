@@ -30,7 +30,7 @@ class KeluargaBinaanApiController extends REST_Controller
             $this->response(array('status' => 200, 'message' => 'Data Keluarga Binaan Tidak Ditemukan!', 'data' => null));
         }
     }
-    
+
     function detailKeluarga_post(){
         $data = array(
             'no_kk' => $this->input->post('no_kk')
@@ -40,13 +40,13 @@ class KeluargaBinaanApiController extends REST_Controller
                 'nomor_kk' => $data['no_kk'],
                 'status_keluarga' => 0
             );
-            
+
             $data_kepala_keluarga = $this->GeneralApiModel->getWhereTransactional($check_kepala_keluarga, "transactional_anggota_keluarga")->row();
             if(!empty($data_kepala_keluarga)){
                 $response = array();
                 $data_alamat = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk']), "keluargabinaan_detail")->row();
                 $data_user = $this->GeneralApiModel->getWhereTransactional(array('id' => $data_kepala_keluarga->id_user), "transactional_user")->row();
-                
+
                 $response['nama_kepel'] = $data_user->namalengkap;
                 if(!empty($data_alamat)){
                     $response['alamat'] = $data_alamat->alamat_lengkap;
@@ -59,7 +59,7 @@ class KeluargaBinaanApiController extends REST_Controller
                 }
                 $response['no_kk'] = $data_kepala_keluarga->nomor_kk;
                 $response['nohp_kepel'] = $data_user->nohp;
-                
+
                 $data_kader = $this->GeneralApiModel->getWhereTransactional(array('role'=>1, 'id_user'=>$data_kepala_keluarga->id_user), "transactional_kode_referal")->row();
                 if(!empty($data_kader)){
                     $response['status_acc_relawan'] = $data_kader->status_acc;
@@ -68,7 +68,7 @@ class KeluargaBinaanApiController extends REST_Controller
                     $response['status_acc_relawan'] = 0;
                     $response['tgl_bergabung'] = '0000-00-00';
                 }
-                
+
                 $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk'], 'status_keluarga !=' => 0), "transactional_anggota_keluarga")->result();
                 $i = 0;
                 foreach($data_anggota_keluarga as $row){
@@ -91,12 +91,12 @@ class KeluargaBinaanApiController extends REST_Controller
             }else{
                 $this->response(array('status' => 200, 'message' => 'kepala keluarga tidak ditemukan', 'data' => null));
             }
-            
+
         }else{
             $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => null));
         }
     }
-    
+
     function detailKader_post(){
         $data = array(
             'id_user' => $this->input->post('id_user')
@@ -118,7 +118,7 @@ class KeluargaBinaanApiController extends REST_Controller
                     'status_acc_relawan' => $data_kader->status_acc,
                     'tgl_bergabung' => $data_kader->tgl_join,
                 );
-                
+
                 $check_anggota = array(
                     'nomor_kk' => $data_kader->nomor_kk,
                     'status_keluarga !=' => 0
@@ -146,7 +146,7 @@ class KeluargaBinaanApiController extends REST_Controller
                 }else{
                     $response['anggota_keluarga'] = array();
                 }
-                
+
                 $check_binaan = array(
                     'id_pembina' => $data['id_user']
                 );
@@ -158,7 +158,7 @@ class KeluargaBinaanApiController extends REST_Controller
                         $data_kepel2 = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $row->nomor_kk, 'status_keluarga' => 0), "transactional_anggota_keluarga")->row();
                         $data_user2 = $data_keluarga = $this->GeneralApiModel->getWhereTransactional(array('id' => $data_kepel2->id_user), "transactional_user")->row();
                         $data_alamat2 = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $row->nomor_kk), "keluargabinaan_detail")->row();
-                        
+
                         $response['keluarga_binaan'][$j]['jml_anggota'] = count($data_keluarga2);
                         $response['keluarga_binaan'][$j]['nama_kepel'] = $data_user2->namalengkap;
                         if(!empty($data_alamat2)){
@@ -183,7 +183,7 @@ class KeluargaBinaanApiController extends REST_Controller
             $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => null));
         }
     }
-    
+
     function gabungKader_post(){
         $data = array(
             'id_user' => $this->input->post('id_user'),
@@ -196,9 +196,9 @@ class KeluargaBinaanApiController extends REST_Controller
                 'id_pelatihan' => $data['id_pelatihan'],
                 'id_kelas' => $data['id_kelas']
             );
-            
+
             $exist_check_referal = $this->GeneralApiModel->isDataTransactionalExist($check_referal, 'transactional_kode_referal');
-            
+
             if(!$exist_check_referal){
                 $input_referal = array(
                     'role' => 1,
@@ -210,18 +210,17 @@ class KeluargaBinaanApiController extends REST_Controller
                     'id_kelas' => $data['id_kelas'],
                     'tgl_join' => $this->dateToday
                 );
-               
+
                 $insert_referal = $this->GeneralApiModel->insertTransactional($input_referal, 'transactional_kode_referal');
                 $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => true));
-                
             }else{
                 $this->response(array('status' => 200, 'message' => 'anda telah terdaftar menjadi kader!', 'data' => null));
             }
-            
         }else{
             $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => null));
         }
     }
+
     function updatekaderByPeserta_post(){
         $data = array(
             'status_acc' => $this->input->post('status_acc'), //0 = ..., 1 = ...
@@ -237,7 +236,7 @@ class KeluargaBinaanApiController extends REST_Controller
                     'id_pembina' => $data['id_pembina'],
                     'status_acc' => 1
                 );
-                
+
                 $result = $this->GeneralApiModel->updateTransactional($update_binaan, $where, 'transactional_kode_referal');
                 if($result){
                     $this->response(array('status' => 200, 'message' => 'ACC Kader oleh peserta telah Berhasil!', 'data' => $result));
@@ -249,13 +248,13 @@ class KeluargaBinaanApiController extends REST_Controller
             else{
                 $this->response(array('status' => 200, 'message' => 'Id Pembina tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
             }
-            
+
         }else if(($data['status_acc'] == 0) && $data['status_acc'] != ''){
             $update_binaan = array(
                 'id_pembina' => 0,
                 'status_acc' => 0
             );
-            
+
             $result = $this->GeneralApiModel->updateTransactional($update_binaan, $where, 'transactional_kode_referal');
             if($result){
                 $this->response(array('status' => 200, 'message' => 'Kader Berhasil ditolak!', 'data' => $result));
@@ -266,9 +265,9 @@ class KeluargaBinaanApiController extends REST_Controller
         }
         else{
             $this->response(array('status' => 200, 'message' => 'Status ACC kader tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
-        } 
+        }
     }
-    
+
     function updateKeluargaBinaanByPeserta_post(){
         $data = array(
             'status_acc' => $this->input->post('status_acc'), //0 = ..., 1 = ...
@@ -282,7 +281,7 @@ class KeluargaBinaanApiController extends REST_Controller
                 $update_binaan = array(
                     'id_pembina' => $data['id_pembina'],
                 );
-                
+
                 $result = $this->GeneralApiModel->updateTransactional($update_binaan, $nomor_kk, 'transactional_binaan');
                 if($result){
                     $this->response(array('status' => 200, 'message' => 'ACC Keluarga Binaan oleh Relawan telah Berhasil!', 'data' => $result));
@@ -294,12 +293,12 @@ class KeluargaBinaanApiController extends REST_Controller
             else{
                 $this->response(array('status' => 200, 'message' => 'Id Pembina tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
             }
-            
+
         }else if(($data['status_acc'] == 0) && $data['status_acc'] != ''){
             $update_binaan = array(
                 'id_pembina' => 0,
             );
-            
+
             $result = $this->GeneralApiModel->updateTransactional($update_binaan, $nomor_kk, 'transactional_binaan');
             if($result){
                 $this->response(array('status' => 200, 'message' => 'Keluarga Binaan oleh Relawan Berhasil ditolak!', 'data' => $result));
@@ -310,6 +309,6 @@ class KeluargaBinaanApiController extends REST_Controller
         }
         else{
             $this->response(array('status' => 200, 'message' => 'Status ACC Relawan tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
-        } 
+        }
     }
 }

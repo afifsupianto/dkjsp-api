@@ -241,7 +241,15 @@ class SkriningApiController extends REST_Controller {
       $return['kondisi_fisik'] = $return_fisik;
       $return['kondisi_mental'] = $return_psikososial;
 
-      $this->response(array('status' => 200, 'message' => 'test', 'data' => $return));
+      $skrining['id_skrining'] = $id_skrining;
+      $skrining['kondisi_fisik'] = $fisik;
+      $skrining['kondisi_mental'] = $psikososial;
+      $skrining['id_user'] = $id_user;
+      $skrining['statusdata'] = 0;
+
+      $this->GeneralApiModel->insertTransactional($skrining, 'transactional_hasil_skrining');
+
+      $this->response(array('status' => 200, 'message' => 'sukses', 'data' => $return));
     }else{
       $this->response(array('status' => 200, 'message' => 'Masukkan id skrining, id user, dan data jawaban terlebih dahulu! data tidak ditemukan', 'data' => null));
     }
