@@ -110,7 +110,7 @@ class PesertaApiController extends REST_Controller
 
       $this->response(array('status' => 200, 'message' => 'Data home peserta berhasil didapatkan', 'data' => $result));
     } else {
-      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan!', 'data' => null));
+      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas salah!', 'data' => null));
     }
   }
 
@@ -330,6 +330,56 @@ class PesertaApiController extends REST_Controller
     }
   }
 
+  function daftarLaporan_post(){
+    $id_user = $this->input->post('id_user');
+    $id_pelatihan = $this->input->post('id_pelatihan');
+    if(!empty($id_pelatihan) && !empty($id_user)){
+      $anggota = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_user), "role", "DESC", "user_anggotakeluarga_detail")->result()[0];
+      $status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
+      $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result()[0];
+      // $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result()[0];
+      $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result()[0];
+      $histori_presensi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
+
+      $histori_aktivitas = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+      $histori_skrining = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+
+      $laporan_aktivitas = array();
+      $total_aktivitas = 0;
+      foreach ($histori_aktivitas as $h) {
+        $total_aktivitas++;
+        array_push($laporan_aktivitas, array('id'=>$h->id, 'cdate'=>$h->cdate));
+      }
+
+      $laporan_skrining = array();
+      foreach ($histori_skrining as $h) {
+        array_push($laporan_skrining, array(
+          'id'=>$h->id,
+          'kondisi_fisik'=>$this->GeneralApiModel->getWhereMaster(array('id' => $h->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama,
+          'kondisi_mental'=>$this->GeneralApiModel->getWhereMaster(array('id' => $h->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama,
+          'cdate'=>$h->cdate));
+      }
+
+      $result = array(
+        'nik'=>$anggota->nik_anggota,
+        'nama'=>$anggota->namalengkap,
+        'status_keluarga'=>$status_keluarga[$anggota->status_keluarga],
+        'umur'=>$this->get_umur($anggota->tgl_lahir),
+        'kondisi_fisik'=>$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama,
+        'kondisi_mental'=>$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama,
+        'terakhir_presensi'=>$histori_presensi[0]->cdate,
+        'terakhir_isi_aktivitas'=>$aktivitas->cdate,
+        'total_presensi'=>count($histori_presensi),
+        'total_laporan'=>$total_aktivitas,
+        'laporan_aktivitas'=>$laporan_aktivitas,
+        'laporan_skrining'=>$laporan_skrining,
+      );
+      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
+    } else {
+      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
+    }
+  }
+
   function date_diff($date){
        $dob = new DateTime($date);
        $now = new DateTime();
@@ -342,5 +392,19 @@ class PesertaApiController extends REST_Controller
        $day = $interval->format('%d');
 
        return $day;
+   }
+
+  function get_umur($date){
+       $dob = new DateTime($date);
+       $now = new DateTime();
+
+       $datetime1 = date_create($dob->format('Y-m-d'));
+       $datetime2 = date_create($now->format('Y-m-d'));
+
+       $interval = date_diff($datetime1, $datetime2);
+
+       $year = $interval->format('%y');
+
+       return $year;
    }
 }
