@@ -273,7 +273,7 @@ class AuthApiController extends REST_Controller
                         $this->response(array('status' => 200, 'message' => 'Login sukses!', 'data' => $result2[0]));
                     }
                     else{
-                        $this->response(array('status' => 200, 'message' => 'Data pada DB view tidak tersedia', 'data' => null));
+                        $this->response(array('status' => 200, 'message' => 'Data tidak tersedia', 'data' => null));
                     }
                 } else {
                     $this->response(array('status' => 200, 'message' => 'Password Anda Salah!', 'data' => null));
