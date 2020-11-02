@@ -34,6 +34,7 @@ $route['api/peserta/lihat-materi'] = 'PesertaApiController/lihatMateri';
 $route['api/peserta/detail-materi'] = 'PesertaApiController/detailMateri';
 $route['api/peserta/lihat-konten-subbab'] = 'PesertaApiController/lihatKontenSubbab';
 $route['api/peserta/daftar-laporan'] = 'PesertaApiController/daftarLaporan';
+$route['api/peserta/lihat-keluarga-peserta'] = 'PesertaApiController/lihatKeluargaPeserta';
 
 //Keluarga Binaan
 $route['api/keluarga-binaan/data-keluarga-binaan'] = 'KeluargaBinaanApiController/getDataKeluargaBinaan';
