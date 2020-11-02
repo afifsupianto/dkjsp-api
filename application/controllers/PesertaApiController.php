@@ -92,6 +92,7 @@ class PesertaApiController extends REST_Controller
       $result = array(
         'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+        'id_grading'=>($kondisi?$kondisi->kondisi_fisik:null),
         'skrining_terakhir'=> array(
           'id'=>($kondisi?$kondisi->id_skrining:null),
           'is_sudah_skrining'=>($kondisi?($this->date_diff($kondisi->cdate)<=14?true:false):null)
