@@ -43,7 +43,7 @@ class AktivitasApiController extends REST_Controller {
           $list_soal = array();
         }
 
-        $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => $list_aktivitas[0]));
+        $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => ($list_aktivitas?$list_aktivitas[0]:null)));
       }else{
         $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => null));
       }
