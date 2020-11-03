@@ -1,7 +1,4 @@
-
-application/x-httpd-php AktivitasApiController.php ( C++ source, ASCII text )
 <?php
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH . '/libraries/REST_Controller.php';
@@ -93,94 +90,64 @@ class AktivitasApiController extends REST_Controller {
     $time_aweek=$time_expired*2;
     header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
     $id_user = $this->input->post('id_user');
+    $id_kelas = $this->input->post('id_kelas');
     $id_pelatihan = $this->input->post('id_pelatihan');
 
     if(!empty($id_pelatihan) && !empty($id_user)){
-      $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
-      $kondisi = ($kondisi?$kondisi[0]:null);
-      $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
-      $presensi = ($presensi?$presensi[0]:null);
+      $semua_kondisi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+      $kondisi = ($semua_kondisi?$semua_kondisi[0]:null);
+      $semua_presensi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
+      $presensi = ($semua_presensi?$semua_presensi[0]:null);
 
-      // $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
-      // $id_pelatihan = $kelas->id_pelatihan;
-      $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+      $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
+      $id_pelatihan = $kelas->id_pelatihan;
+      $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
       $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
-      $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_kelas"=>$id_kelas), "cdate", "ASC", " transactional_binaan")->result();
-      $list_binaan = array();
-      foreach ($binaan as $b) {
-        $no_kk = $b->nomor_kk;
-        $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk), 'user_anggotakeluarga_detail')->result()[0];
-        array_push($list_binaan, array("nomor_kk"=>$no_kk, "nama"=>$daftar->namalengkap));
-      }
-
-      $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_kelas"=>$id_kelas, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
-      $list_kader = array();
-      foreach ($kader as $b) {
-        $id_user = $b->id_user;
-        $daftar = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_user), 'transactional_user')->result()[0];
-        array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
-      }
-
-      $list_materi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_kelas"=>$id_kelas),"id_materi","ASC","list_materi_jadwal")->result();
-
-      $i = 0;
-      foreach($list_materi as $row){
-        $materi['list_materi'][$i]['id'] = $row->id_materi;
-        $materi['list_materi'][$i]['judul_materi'] = $row->judul_materi;
-        $materi['list_materi'][$i]['jumlah_subbab'] = $row->jml_subbab;
-        $materi['list_materi'][$i]['jumlah_subbab_selesai'] = $row->jml_subbab_selesai;
-        if($row->status_buka == 1){
-          if(($row->jml_subbab == $row->jml_subbab_selesai) && $row->jml_subbab != 0){
-            $materi['list_materi'][$i]['status'] = 2;
-          } else {
-            $materi['list_materi'][$i]['status'] = 1;
-          }
-        } else {
-          $materi['list_materi'][$i]['status'] = 0;
-        }
-        $materi['list_materi'][$i]['list_subbab'] = array();
-
-        //foreach untuk set daftar list subbab
-        $id_materi = array(
-          'id_materi' => $row->id_materi
+      $list_skrining = array();
+      foreach ($semua_kondisi as $k) {
+        $nama = $this->GeneralApiModel->getWhereMaster(array('id'=>$k->id_skrining), 'masterdata_skrining')->result()[0]->nama;
+        array_push($list_skrining,
+          array(
+            'nama'=>$nama,
+            'hasil_test_terakhir'=>array(
+                'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+                'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+                'tanggal_isi' => $k->cdate
+            )
+          )
         );
-        $result2 = $this->GeneralApiModel->getWhereMaster($id_materi, "masterdata_subbab_materi")->result();
-        $j = 0;
-        foreach($result2 as $row){
-          $materi['list_materi'][$i]['list_subbab'][$j]['id_subbab'] = $row->id;
-          $materi['list_materi'][$i]['list_subbab'][$j]['judul_subbab'] = $row->judul;
-          $materi['list_materi'][$i]['list_subbab'][$j]['is_test'] = $row->is_test;
-          $j++;
-        }
-        $i++;
       }
 
       $result = array(
+        'is_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null),
+        'jml_presensi'=>count($semua_presensi),
+        'is_aktivitas_harian'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null),
         'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'id_grading'=>($kondisi?$kondisi->kondisi_fisik:null),
-        'skrining_terakhir'=> array(
-          'id'=>($kondisi?$kondisi->id_skrining:null),
-          'is_sudah_skrining'=>($kondisi?($this->date_diff($kondisi->cdate)<=14?true:false):null)
-        ),
-        'presensi_terakhir' => array(
-          'waktu'=>($presensi?$presensi->cdate:null),
-          'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)
-        ),
-        'laporan_harian_terakhir' => array(
-          'id'=> ($aktivitas?$aktivitas->id_aktivitas:null),
-          'waktu'=>($aktivitas?$aktivitas->cdate:null),
-          'is_sudah_isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null)
-        ),
-        'list_materi' => $materi,
-        'list_keluargabinaan' => $list_binaan,
-        'list_kader' => $list_kader
+        'countdown_next'=>$this->date_diff($kondisi->cdate),
+        'list_skrining'=>$list_skrining
       );
 
-      $this->response(array('status' => 200, 'message' => 'Data home peserta berhasil didapatkan', 'data' => $result));
+      $this->response(array('status' => 200, 'message' => 'Data aktivitas peserta berhasil didapatkan', 'data' => $result));
     } else {
-      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas salah!', 'data' => null));
+      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas / id pelatihan salah!', 'data' => null));
     }
+  }
+
+  function date_diff($date){
+    $dob = new DateTime($date);
+    $now = new DateTime();
+
+    $datetime1 = date_create($dob->format('Y-m-d h:m:s'));
+    $datetime2 = date_create($now->format('Y-m-d h:m:s'));
+
+    $interval = date_diff($datetime1, $datetime2);
+
+    $day = $interval->format('%d');
+    $hour = $interval->format('%h');
+
+    return array('hari'=>$day, 'jam'=>$hour);
   }
 }

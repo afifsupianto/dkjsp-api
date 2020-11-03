@@ -422,10 +422,11 @@ class PesertaApiController extends REST_Controller
       $id_user = $this->input->post('id_user');
       $id_kelas = $this->input->post('id_kelas');
       if(!empty($id_kelas) && !empty($id_user)){
-        $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
+        $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result();
         $list_binaan = array();
         $list_kader = array();
         if ($kelas) {
+          $kelas = $kelas[0];
           $id_pelatihan = $kelas->id_pelatihan;
           $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "ASC", " transactional_binaan")->result();
           foreach ($binaan as $b) {
