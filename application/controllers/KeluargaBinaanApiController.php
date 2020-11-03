@@ -72,37 +72,45 @@ class KeluargaBinaanApiController extends REST_Controller
                     $response['tgl_bergabung'] = '0000-00-00';
                 }
 
-                $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk']), "transactional_anggota_keluarga")->result();
+                $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk']), "semua_anggota_keluarga")->result();
                 $i = 0;
+                $list_anggota = array();
+                $list_status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
                 foreach($data_anggota_keluarga as $row){
-                    $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id_user), "transactional_user")->row();
 
-                    $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+                    $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id), "transactional_user")->row();
+
+                    $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id), "cdate", "DESC", "transactional_hasil_skrining")->result();
                     $kondisi = ($kondisi?$kondisi[0]:null);
                     $kondisi_fisik = ($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
                     $kondisi_mental = ($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
 
-                    $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user), "cdate", "DESC", "transactional_presensi")->result();
+                    $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id), "cdate", "DESC", "transactional_presensi")->result();
                     $presensi = ($presensi?$presensi[0]:null);
 
                     $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
                     $id_pelatihan = $kelas->id_pelatihan;
-                    $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+                    $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
                     $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
-                    $response['anggota_keluarga'][$i]['kondisi_fisik'] = $kondisi_fisik;
-                    $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
-                    $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;
-                    $response['anggota_keluarga'][$i]['nik'] = $row->nik_anggota;
-                    if($row->status_keluarga == 1){
-                        $response['anggota_keluarga'][$i]['status_keluarga'] = "Istri";
-                    }
-                    else if($row->status_keluarga == 2){
-                        $response['anggota_keluarga'][$i]['status_keluarga'] = "anak";
-                    }
-                    $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = ($aktivitas?$aktivitas->cdate:null);
-                    $response['anggota_keluarga'][$i]['terakhir_presensi'] = ($presensi?$presensi->cdate:null);
-                    $response['anggota_keluarga'][$i]['umur'] = floor((time() - strtotime($data_anggota->tgl_lahir)) / 31556926);
+                    array_push($list_anggota, array(
+                      "kondisi_fisik"=> $kondisi_fisik,
+                      "kondisi_mental"=> $kondisi_mental,
+                      "nama"=> "$data_anggota->namalengkap",
+                      "nik"=> $row->nik_anggota,
+                      "terakhir_isi_aktivitas"=> ($aktivitas?$aktivitas->cdate:null),
+                      "terakhir_presensi"=> ($presensi?$presensi->cdate:null),
+                      "umur"=> floor((time() - strtotime($data_anggota->tgl_lahir)) / 31556926),
+                      "status_keluarga"=> $list_status_keluarga[$row->status_keluarga]
+                    ));
+                    //
+                    $response['anggota_keluarga'] = $list_anggota;
+                    // $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
+                    // $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;
+                    // $response['anggota_keluarga'][$i]['nik'] = $row->nik_anggota;
+                    // $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = ($aktivitas?$aktivitas->cdate:null);
+                    // $response['anggota_keluarga'][$i]['terakhir_presensi'] = ($presensi?$presensi->cdate:null);
+                    // $response['anggota_keluarga'][$i]['umur'] = floor((time() - strtotime($data_anggota->tgl_lahir)) / 31556926);
                 }
                 $this->response(array('status' => 200, 'message' => 'test', 'data' => $response));
             }else{
