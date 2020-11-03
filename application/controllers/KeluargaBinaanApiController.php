@@ -72,7 +72,7 @@ class KeluargaBinaanApiController extends REST_Controller
                     $response['tgl_bergabung'] = '0000-00-00';
                 }
 
-                $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk'], 'status_keluarga !=' => 0), "transactional_anggota_keluarga")->result();
+                $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk']), "transactional_anggota_keluarga")->result();
                 $i = 0;
                 foreach($data_anggota_keluarga as $row){
                     $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id_user), "transactional_user")->row();
