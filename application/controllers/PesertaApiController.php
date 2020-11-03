@@ -106,7 +106,7 @@ class PesertaApiController extends REST_Controller
           'waktu'=>($aktivitas?$aktivitas->cdate:null),
           'is_sudah_isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null)
         ),
-        'list_materi' => $materi,
+        'list_materi' => $materi["list_materi"],
         'list_keluargabinaan' => $list_binaan,
         'list_kader' => $list_kader
       );

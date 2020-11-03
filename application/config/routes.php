@@ -64,6 +64,7 @@ $route['api/skrining/submit-skrining'] = 'SkriningApiController/submitSkrining';
 //Aktivitas
 $route['api/aktivitas/data-aktivitas'] = 'AktivitasApiController/dataAktivitas';
 $route['api/aktivitas/submit-aktivitas'] = 'AktivitasApiController/submitAktivitas';
+$route['api/aktivitas/aktivitas-peserta'] = 'AktivitasApiController/aktivitasPeserta';
 
 
 /** DKJPS API WEB **/
