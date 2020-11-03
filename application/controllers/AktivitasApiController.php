@@ -58,6 +58,7 @@ class AktivitasApiController extends REST_Controller {
   function submitAktivitas_post(){
     $data = json_decode($this->input->raw_input_stream, TRUE);
     $id_user = $data["id_user"];
+    $id_kelas = $data["id_kelas"];
     $id_pelatihan = $data["id_pelatihan"];
     $data_soal = $data["data_soal"];
     $id_aktivitas = $data["id_aktivitas"];
@@ -72,7 +73,7 @@ class AktivitasApiController extends REST_Controller {
           foreach ($vs["data_jawaban"] as $kb => $vb) {
             $id_jawaban = $vb["id_jawaban"];
             $nilai = $vb["nilai"];
-            array_push($list_aktivitas, array("id_pelatihan"=>$id_pelatihan, "id_user"=>$id_user, "id_aktivitas"=>$id_aktivitas, "id_soal"=>$id_soal, "id_jawaban"=>$id_jawaban, "nilai"=>$nilai));
+            array_push($list_aktivitas, array("id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan, "id_user"=>$id_user, "id_aktivitas"=>$id_aktivitas, "id_soal"=>$id_soal, "id_jawaban"=>$id_jawaban, "nilai"=>$nilai));
           }
         }
     //   }
@@ -91,10 +92,6 @@ class AktivitasApiController extends REST_Controller {
     $time_expired=60*60*24*3;
     $time_aweek=$time_expired*2;
     header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
-    $id_kelas = array(
-      'id_kelas' => $this->input->post('id_kelas'),
-      'id_user' => $this->input->post('id_user')
-    );
     $id_user = $this->input->post('id_user');
     $id_pelatihan = $this->input->post('id_pelatihan');
 
