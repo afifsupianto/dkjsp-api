@@ -126,7 +126,7 @@ class AktivitasApiController extends REST_Controller {
         'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'id_grading'=>($kondisi?$kondisi->kondisi_fisik:null),
-        'countdown_next'=>$this->date_diff($kondisi->cdate),
+        'countdown_next'=>$this->countdown_next($kondisi->cdate),
         'list_skrining'=>$list_skrining
       );
 
@@ -136,7 +136,7 @@ class AktivitasApiController extends REST_Controller {
     }
   }
 
-  function date_diff($date){
+  function countdown_next($date){
     $dob = new DateTime($date);
     $now = new DateTime();
 
@@ -149,5 +149,19 @@ class AktivitasApiController extends REST_Controller {
     $hour = $interval->format('%h');
 
     return array('hari'=>$day, 'jam'=>$hour);
+  }
+
+  function date_diff($date){
+    $dob = new DateTime($date);
+    $now = new DateTime();
+
+    $datetime1 = date_create($dob->format('Y-m-d h:m:s'));
+    $datetime2 = date_create($now->format('Y-m-d h:m:s'));
+
+    $interval = date_diff($datetime1, $datetime2);
+
+    $day = $interval->format('%d');
+
+    return $day;
   }
 }
