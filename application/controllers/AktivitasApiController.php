@@ -148,6 +148,11 @@ class AktivitasApiController extends REST_Controller {
     $day = $interval->format('%d');
     $hour = $interval->format('%h');
 
+    $to_hour = ($day*24)+$hour;
+    $result = (14*24)-$to_hour;
+    $day = intval($result/24);
+    $hour = $result%24;
+
     return array('hari'=>$day, 'jam'=>$hour);
   }
 
