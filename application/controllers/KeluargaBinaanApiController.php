@@ -35,7 +35,10 @@ class KeluargaBinaanApiController extends REST_Controller
         $data = array(
             'no_kk' => $this->input->post('no_kk')
         );
-        if(!empty($data['no_kk'])){
+        $id_user = $this->input->post('id_user');
+        $id_kelas = $this->input->post('id_kelas');
+        $id_pelatihan = $this->input->post('id_pelatihan');
+        if(!empty($data['no_kk']) && !empty($id_kelas) && !empty($id_pelatihan)){
             $check_kepala_keluarga = array(
                 'nomor_kk' => $data['no_kk'],
                 'status_keluarga' => 0
@@ -73,8 +76,22 @@ class KeluargaBinaanApiController extends REST_Controller
                 $i = 0;
                 foreach($data_anggota_keluarga as $row){
                     $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id_user), "transactional_user")->row();
-                    $response['anggota_keluarga'][$i]['kondisi_fisik'] = "sehat";
-                    $response['anggota_keluarga'][$i]['kondisi_mental'] = "sehat";
+
+                    $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+                    $kondisi = ($kondisi?$kondisi[0]:null);
+                    $kondisi_fisik = ($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
+                    $kondisi_mental = ($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
+
+                    $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user), "cdate", "DESC", "transactional_presensi")->result();
+                    $presensi = ($presensi?$presensi[0]:null);
+
+                    $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
+                    $id_pelatihan = $kelas->id_pelatihan;
+                    $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+                    $aktivitas = ($aktivitas?$aktivitas[0]:null);
+
+                    $response['anggota_keluarga'][$i]['kondisi_fisik'] = $kondisi_fisik;
+                    $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
                     $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;
                     $response['anggota_keluarga'][$i]['nik'] = $row->nik_anggota;
                     if($row->status_keluarga == 1){
@@ -83,8 +100,8 @@ class KeluargaBinaanApiController extends REST_Controller
                     else if($row->status_keluarga == 2){
                         $response['anggota_keluarga'][$i]['status_keluarga'] = "anak";
                     }
-                    $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = $this->dateToday;
-                    $response['anggota_keluarga'][$i]['terakhir_presensi'] = $this->dateToday;
+                    $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = ($aktivitas?$aktivitas->cdate:null);
+                    $response['anggota_keluarga'][$i]['terakhir_presensi'] = ($presensi?$presensi->cdate:null);
                     $response['anggota_keluarga'][$i]['umur'] = floor((time() - strtotime($data_anggota->tgl_lahir)) / 31556926);
                 }
                 $this->response(array('status' => 200, 'message' => 'test', 'data' => $response));
@@ -93,7 +110,7 @@ class KeluargaBinaanApiController extends REST_Controller
             }
 
         }else{
-            $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => null));
+            $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda (no kk, id kelas, id pelatihan)!', 'data' => null));
         }
     }
 
@@ -138,6 +155,14 @@ class KeluargaBinaanApiController extends REST_Controller
                         $kondisi_fisik = ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
                         $kondisi_mental = ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
 
+                        $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
+                        $presensi = ($presensi?$presensi[0]:null);
+
+                        $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
+                        $id_pelatihan = $kelas->id_pelatihan;
+                        $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+                        $aktivitas = ($aktivitas?$aktivitas[0]:null);
+
                         $response['anggota_keluarga'][$i]['kondisi_fisik'] = $kondisi_fisik;
                         $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
                         $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;
@@ -148,8 +173,8 @@ class KeluargaBinaanApiController extends REST_Controller
                         else if($row->status_keluarga == 2){
                             $response['anggota_keluarga'][$i]['status_keluarga'] = "anak";
                         }
-                        $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = $this->dateToday;
-                        $response['anggota_keluarga'][$i]['terakhir_presensi'] = $this->dateToday;
+                        $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = ($aktivitas?$aktivitas->cdate:null);
+                        $response['anggota_keluarga'][$i]['terakhir_presensi'] = ($presensi?$presensi->cdate:null);
                         $response['anggota_keluarga'][$i]['umur'] = floor((time() - strtotime($data_anggota->tgl_lahir)) / 31556926);
                         $i++;
                     }
@@ -190,7 +215,7 @@ class KeluargaBinaanApiController extends REST_Controller
                 $this->response(array('status' => 200, 'message' => 'Data kader tidak ditemukan', 'data' => null));
             }
         }else{
-            $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => null));
+            $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda (id user, id kelas, id pelatihan)!', 'data' => null));
         }
     }
 
