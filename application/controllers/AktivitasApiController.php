@@ -1,3 +1,5 @@
+
+application/x-httpd-php AktivitasApiController.php ( C++ source, ASCII text )
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -44,7 +46,7 @@ class AktivitasApiController extends REST_Controller {
           $list_soal = array();
         }
 
-        $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => $list_aktivitas));
+        $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => $list_aktivitas[0]));
       }else{
         $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => null));
       }
@@ -57,15 +59,15 @@ class AktivitasApiController extends REST_Controller {
     $data = json_decode($this->input->raw_input_stream, TRUE);
     $id_user = $data["id_user"];
     $id_pelatihan = $data["id_pelatihan"];
-    $data_aktivitas = $data["data_aktivitas"];
+    $data_soal = $data["data_soal"];
+    $id_aktivitas = $data["id_aktivitas"];
 
     $user = $this->GeneralApiModel->getWhereTransactional(array('id' => $id_user),'transactional_user')->result();
 
     $list_aktivitas = array();
     if(!empty($id_pelatihan) && !empty($user)){
-      foreach ($data_aktivitas as $ka => $va) {
-        $id_aktivitas = $va["id_aktivitas"];
-        foreach ($va["data_soal"] as $ks => $vs) {
+    //   foreach ($data_aktivitas as $ka => $va) {
+        foreach ($data_soal as $ks => $vs) {
           $id_soal = $vs["id_soal"];
           foreach ($vs["data_jawaban"] as $kb => $vb) {
             $id_jawaban = $vb["id_jawaban"];
@@ -73,7 +75,7 @@ class AktivitasApiController extends REST_Controller {
             array_push($list_aktivitas, array("id_pelatihan"=>$id_pelatihan, "id_user"=>$id_user, "id_aktivitas"=>$id_aktivitas, "id_soal"=>$id_soal, "id_jawaban"=>$id_jawaban, "nilai"=>$nilai));
           }
         }
-      }
+    //   }
       $status = $this->GeneralApiModel->insertBatchTransactional($list_aktivitas, "transactional_hasil_aktivitas");
       if ($status) {
         $this->response(array('status' => 200, 'message' => 'sukses isi laporan', 'data'=>true));
@@ -81,7 +83,7 @@ class AktivitasApiController extends REST_Controller {
         $this->response(array('status' => 200, 'message' => 'gagal isi laporan', 'data'=>false));
       }
     }else{
-      $this->response(array('status' => 200, 'message' => 'Masukkan id user dan id pelatihan terlebih dahulu! data tidak ditemukan', 'data' => $data));
+      $this->response(array('status' => 200, 'message' => 'Masukkan id user dan id pelatihan terlebih dahulu! data tidak ditemukan', 'data' => false));
     }
   }
 }
