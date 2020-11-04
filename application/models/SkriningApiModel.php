@@ -12,12 +12,12 @@ class SkriningApiModel extends CI_Model
             $data['nama'] = $result->soal;
             $data['tipe'] = $result->tipe;
             $data['list_jawaban'] = array();
-            
+
             $result2 = $db->get_where('masterdata_pilihan_jawaban_skrining', array('id_soal' => $result->id))->result();
             $i = 0;
         // }
-        
-        
+
+
         // if(!empty($result2)){
             foreach($result2 as $row){
                 $data['list_jawaban'][$i]['id'] = $row->id;
@@ -30,15 +30,23 @@ class SkriningApiModel extends CI_Model
                 $i++;
             }
         }
-        
+
         $data_obj = $obj;
         $data_obj=$data;
         return $data_obj;
-        
+
         //if($data === 0){
         //    return 1;
         //}else{
         //    return $data * $this->recursiveAnakSoal($data-1);
         //}
+    }
+
+    function getAllSkrining($where){
+      $this->db->distinct('cdate');
+      $this->db->select('cdate');
+      $this->db->where($where);
+      $query = $this->db->get('transactional_hasil_skrining');
+      return $query;
     }
 }
