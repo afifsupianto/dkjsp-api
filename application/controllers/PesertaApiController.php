@@ -337,13 +337,17 @@ class PesertaApiController extends REST_Controller
     $id_user = $this->input->post('id_user');
     $id_pelatihan = $this->input->post('id_pelatihan');
     if(!empty($id_pelatihan) && !empty($id_user)){
-      $anggota = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_user), "role", "DESC", "user_anggotakeluarga_detail")->result()[0];
       $status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
-      $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result()[0];
-      // $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result()[0];
-      $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result()[0];
-      $histori_presensi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
+      $anggota = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_user), "role", "DESC", "user_anggotakeluarga_detail")->result();
+      $anggota = ($anggota?$anggota[0]:null);
+      $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+      $kondisi = ($kondisi?$kondisi[0]:null);
 
+      // $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result()[0];
+      $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+      $aktivitas = ($aktivitas?$aktivitas[0]:null);
+
+      $histori_presensi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
       $histori_aktivitas = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
       $histori_skrining = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
 
@@ -364,14 +368,14 @@ class PesertaApiController extends REST_Controller
         }
 
         $result = array(
-          'nik'=>$anggota->nik_anggota,
-          'nama'=>$anggota->namalengkap,
-          'status_keluarga'=>$status_keluarga[$anggota->status_keluarga],
-          'umur'=>$this->get_umur($anggota->tgl_lahir),
-          'kondisi_fisik'=>$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama,
-          'kondisi_mental'=>$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama,
-          'terakhir_presensi'=>$histori_presensi[0]->cdate,
-          'terakhir_isi_aktivitas'=>$aktivitas->cdate,
+          'nik'=>($anggota?$anggota->nik_anggota:null),
+          'nama'=>($anggota?$anggota->namalengkap:null),
+          'status_keluarga'=>($anggota?$status_keluarga[$anggota->status_keluarga]:null),
+          'umur'=>($anggota?$this->get_umur($anggota->tgl_lahir):null),
+          'kondisi_fisik'=>($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+          'kondisi_mental'=>($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+          'terakhir_presensi'=>($histori_presensi?$histori_presensi[0]->cdate:null),
+          'terakhir_isi_aktivitas'=>($aktivitas?$aktivitas->cdate:null),
           'total_presensi'=>count($histori_presensi),
           'total_laporan'=>$total_aktivitas,
           'laporan_aktivitas'=>$laporan_aktivitas,

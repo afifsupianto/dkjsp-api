@@ -213,6 +213,54 @@ class AktivitasApiController extends REST_Controller {
     }
   }
 
+  function detailLaporan_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+    $id_user = $this->input->post('id_user');
+    $id_kelas = $this->input->post('id_kelas');
+    $id_pelatihan = $this->input->post('id_pelatihan');
+    $id_pembina = $this->input->post('id_pembina');
+    $tgl_aktivitas = $this->input->post('tgl_aktivitas');
+
+    if(!empty($id_pelatihan) && !empty($id_user) && !empty($id_kelas) && !empty($id_pembina)){
+      $list_aktivitas = array();
+      $list_soal = array();
+      $list_jawaban = array();
+
+      $sdate = "$tgl_aktivitas 00:00:00"
+      $edate = "$tgl_aktivitas 23:59:59"
+      $semua_aktivitas = $this->AktivitasApiModel->getAktivitasHarian(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan, 'cdate >='=>$sdate, 'cdate <='=>$edate))->result();
+      $hasil_aktivitas = ($semua_aktivitas?$semua_aktivitas[0]:null);
+
+      // $aktivitas = $this->GeneralApiModel->getWhereMaster(array('id'=>$hasil_aktivitas->id_aktivitas), "masterdata_aktivitas")->result();
+      // foreach ($semua_aktivitas as $kd => $vd) {
+        $soal = $this->GeneralApiModel->getWhereMaster(array('id_aktivitas'=>$hasil_aktivitas->id_aktivitas), "masterdata_soal_aktivitas")->result();
+        foreach ($soal as $ks => $vs) {
+          $jawaban = $this->GeneralApiModel->getWhereMaster(array('id_soal'=>$vs->id), "masterdata_pilihan_jawaban_aktivitas")->result();
+          foreach ($jawaban as $kj => $vj) {
+            array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
+          }
+          array_push($list_soal, array("soal"=>$vs->soal, "data_jawaban"=>$list_jawaban));
+          $list_jawaban = array();
+        }
+        // $list_soal = array();
+      //   array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>"Nama kegiatan", "list_soal"=>$list_soal));
+      // }
+
+      $result = array(
+        'cdate'=>'',
+        'file_pdf'=>'',
+        'data_record'=>''
+      );
+
+      // $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => ($list_soal?$list_soal[0]:null)));
+      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => count($semua_aktivitas).'-'.count($soal)));
+    } else {
+      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas / id pelatihan / id pembina salah!', 'data' => null));
+    }
+  }
+
   function countdown_next($date){
     $dob = new DateTime($date);
     $now = new DateTime();
@@ -246,4 +294,4 @@ class AktivitasApiController extends REST_Controller {
 
     return $day;
   }
-  }
+}

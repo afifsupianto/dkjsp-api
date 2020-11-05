@@ -150,7 +150,7 @@ class KeluargaBinaanApiController extends REST_Controller
 
                 $check_anggota = array(
                     'nomor_kk' => $data_kader->nomor_kk,
-                    'status_keluarga !=' => 0
+                    // 'status_keluarga !=' => 0
                 );
                 $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional($check_anggota, "transactional_anggota_keluarga")->result();
                 $i = 0;
@@ -175,12 +175,8 @@ class KeluargaBinaanApiController extends REST_Controller
                         $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
                         $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;
                         $response['anggota_keluarga'][$i]['nik'] = $row->nik_anggota;
-                        if($row->status_keluarga == 1){
-                            $response['anggota_keluarga'][$i]['status_keluarga'] = "Istri";
-                        }
-                        else if($row->status_keluarga == 2){
-                            $response['anggota_keluarga'][$i]['status_keluarga'] = "anak";
-                        }
+                        $status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
+                        $response['anggota_keluarga'][$i]['status_keluarga'] = $status_keluarga[$row->status_keluarga];
                         $response['anggota_keluarga'][$i]['terakhir_isi_aktivitas'] = ($aktivitas?$aktivitas->cdate:null);
                         $response['anggota_keluarga'][$i]['terakhir_presensi'] = ($presensi?$presensi->cdate:null);
                         $response['anggota_keluarga'][$i]['umur'] = floor((time() - strtotime($data_anggota->tgl_lahir)) / 31556926);

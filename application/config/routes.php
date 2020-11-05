@@ -66,6 +66,7 @@ $route['api/aktivitas/data-aktivitas'] = 'AktivitasApiController/dataAktivitas';
 $route['api/aktivitas/submit-aktivitas'] = 'AktivitasApiController/submitAktivitas';
 $route['api/aktivitas/aktivitas-peserta'] = 'AktivitasApiController/aktivitasPeserta';
 $route['api/aktivitas/my-aktivitas'] = 'AktivitasApiController/myAktivitas';
+$route['api/aktivitas/detail-laporan'] = 'AktivitasApiController/detailLaporan';
 
 
 /** DKJPS API WEB **/
