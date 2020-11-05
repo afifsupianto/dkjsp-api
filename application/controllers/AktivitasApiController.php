@@ -125,6 +125,7 @@ class AktivitasApiController extends REST_Controller {
       $result = array(
         'is_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null),
         'jml_presensi'=>count($semua_presensi),
+        'presensi_terakhir'=>$presensi->cdate,
         'aktivitas_harian_terakhir'=>$aktivitas->cdate,
         'total_aktivitas_harian'=>count($semua_aktivitas),
         'is_aktivitas_harian'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null),
