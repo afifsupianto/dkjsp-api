@@ -172,7 +172,7 @@ class KeluargaBinaanApiController extends REST_Controller
                         $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
                         $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
-                        $response['anggota_keluarga'][$i]['id_user'] = $row->id_user,
+                        $response['anggota_keluarga'][$i]['id_user'] = $row->id_user;
                         $response['anggota_keluarga'][$i]['kondisi_fisik'] = $kondisi_fisik;
                         $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
                         $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;
