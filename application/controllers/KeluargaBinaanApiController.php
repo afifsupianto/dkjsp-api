@@ -78,7 +78,7 @@ class KeluargaBinaanApiController extends REST_Controller
                 $list_status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
                 foreach($data_anggota_keluarga as $row){
 
-                    $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id), "transactional_user")->row();
+                    $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id_user), "transactional_user")->row();
 
                     $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id), "cdate", "DESC", "transactional_hasil_skrining")->result();
                     $kondisi = ($kondisi?$kondisi[0]:null);
