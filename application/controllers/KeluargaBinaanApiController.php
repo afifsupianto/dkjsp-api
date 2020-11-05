@@ -72,7 +72,7 @@ class KeluargaBinaanApiController extends REST_Controller
                     $response['tgl_bergabung'] = '0000-00-00';
                 }
 
-                $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk']), "semua_anggota_keluarga")->result();
+                $data_anggota_keluarga = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk' => $data['no_kk']), "transactional_anggota_keluarga")->result();
                 $i = 0;
                 $list_anggota = array();
                 $list_status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
@@ -94,6 +94,7 @@ class KeluargaBinaanApiController extends REST_Controller
                     $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
                     array_push($list_anggota, array(
+                      "id_user"=> $row->id_user,
                       "kondisi_fisik"=> $kondisi_fisik,
                       "kondisi_mental"=> $kondisi_mental,
                       "nama"=> "$data_anggota->namalengkap",
@@ -171,6 +172,7 @@ class KeluargaBinaanApiController extends REST_Controller
                         $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
                         $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
+                        $response['anggota_keluarga'][$i]['id_user'] = $row->id_user,
                         $response['anggota_keluarga'][$i]['kondisi_fisik'] = $kondisi_fisik;
                         $response['anggota_keluarga'][$i]['kondisi_mental'] = $kondisi_mental;
                         $response['anggota_keluarga'][$i]['nama'] = $data_anggota->namalengkap;

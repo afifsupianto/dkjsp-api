@@ -335,8 +335,10 @@ class PesertaApiController extends REST_Controller
 
   function daftarLaporan_post(){
     $id_user = $this->input->post('id_user');
+    $id_kelas = $this->input->post('id_kelas');
     $id_pelatihan = $this->input->post('id_pelatihan');
-    if(!empty($id_pelatihan) && !empty($id_user)){
+
+    if(!empty($id_pelatihan) && !empty($id_user) && !empty($id_kelas)){
       $status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
       $anggota = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_user), "role", "DESC", "user_anggotakeluarga_detail")->result();
       $anggota = ($anggota?$anggota[0]:null);
@@ -348,7 +350,7 @@ class PesertaApiController extends REST_Controller
       $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
       $histori_presensi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
-      $histori_aktivitas = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+      $histori_aktivitas = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
       $histori_skrining = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
 
       $laporan_aktivitas = array();
@@ -383,7 +385,7 @@ class PesertaApiController extends REST_Controller
         );
         $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
       } else {
-        $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
+        $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan / id kelas tidak tersedia!', 'data' => null));
       }
     }
 
