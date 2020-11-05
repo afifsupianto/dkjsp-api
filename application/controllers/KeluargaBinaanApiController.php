@@ -80,17 +80,17 @@ class KeluargaBinaanApiController extends REST_Controller
 
                     $data_anggota = $this->GeneralApiModel->getWhereTransactional(array('id' => $row->id_user), "transactional_user")->row();
 
-                    $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id), "cdate", "DESC", "transactional_hasil_skrining")->result();
+                    $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
                     $kondisi = ($kondisi?$kondisi[0]:null);
                     $kondisi_fisik = ($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
                     $kondisi_mental = ($kondisi?$this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null);
 
-                    $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id), "cdate", "DESC", "transactional_presensi")->result();
+                    $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user), "cdate", "DESC", "transactional_presensi")->result();
                     $presensi = ($presensi?$presensi[0]:null);
 
                     $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
                     $id_pelatihan = $kelas->id_pelatihan;
-                    $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+                    $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$row->id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
                     $aktivitas = ($aktivitas?$aktivitas[0]:null);
 
                     array_push($list_anggota, array(
