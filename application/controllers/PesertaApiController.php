@@ -13,6 +13,7 @@ class PesertaApiController extends REST_Controller
     date_default_timezone_set("Asia/Jakarta");
     $this->dateToday = date("Y-m-d H:i:s");
     $this->timeToday = date("h:i:s");
+    $this->load->model("AktivitasApiModel");
     $this->load->model("PesertaApiModel");
     $this->load->model("GeneralApiModel");
   }
@@ -354,12 +355,12 @@ class PesertaApiController extends REST_Controller
       // $histori_aktivitas = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
       $histori_skrining = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
 
-      $laporan_aktivitas = array();
-      $total_aktivitas = 0;
-      foreach ($histori_aktivitas as $h) {
-        $total_aktivitas++;
-        array_push($laporan_aktivitas, array('id'=>$h->id, 'cdate'=>$h->cdate));
-      }
+      // $laporan_aktivitas = array();
+      // $total_aktivitas = 0;
+      // foreach ($histori_aktivitas as $h) {
+        // $total_aktivitas++;
+        // array_push($laporan_aktivitas, array('id'=>$h->id_aktivitas, 'cdate'=>$h->cdate));
+      // }
 
       $laporan_skrining = array();
       foreach ($histori_skrining as $h) {
@@ -380,8 +381,9 @@ class PesertaApiController extends REST_Controller
           'terakhir_presensi'=>($histori_presensi?$histori_presensi[0]->cdate:null),
           'terakhir_isi_aktivitas'=>($aktivitas?$aktivitas->cdate:null),
           'total_presensi'=>count($histori_presensi),
-          'total_laporan'=>$total_aktivitas,
-          'laporan_aktivitas'=>$laporan_aktivitas,
+          'total_laporan'=>count($histori_aktivitas),
+          'laporan_aktivitas'=>$histori_aktivitas,
+          // 'laporan_aktivitas'=>$laporan_aktivitas,
           'laporan_skrining'=>$laporan_skrining,
         );
         $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
