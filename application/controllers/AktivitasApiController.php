@@ -13,6 +13,7 @@ class AktivitasApiController extends REST_Controller {
       $this->load->model("GeneralApiModel");
       $this->load->model("AktivitasApiModel");
       $this->load->model("SkriningApiModel");
+      $this->load->library('Pdf');
     }
 
     function dataAktivitas_post(){
@@ -223,41 +224,93 @@ class AktivitasApiController extends REST_Controller {
     $id_pembina = $this->input->post('id_pembina');
     $tgl_aktivitas = $this->input->post('tgl_aktivitas');
 
-    if(!empty($id_pelatihan) && !empty($id_user) && !empty($id_kelas) && !empty($id_pembina)){
+    if(!empty($id_pelatihan) && !empty($id_user) && !empty($id_kelas) && !empty($id_pembina) && !empty($tgl_aktivitas) ){
       $list_aktivitas = array();
       $list_soal = array();
       $list_jawaban = array();
 
-      $sdate = "$tgl_aktivitas 00:00:00"
-      $edate = "$tgl_aktivitas 23:59:59"
-      $semua_aktivitas = $this->AktivitasApiModel->getAktivitasHarian(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan, 'cdate >='=>$sdate, 'cdate <='=>$edate))->result();
-      $hasil_aktivitas = ($semua_aktivitas?$semua_aktivitas[0]:null);
+      $sdate = "$tgl_aktivitas 00:00:00";
+      $edate = "$tgl_aktivitas 23:59:59";
 
-      // $aktivitas = $this->GeneralApiModel->getWhereMaster(array('id'=>$hasil_aktivitas->id_aktivitas), "masterdata_aktivitas")->result();
-      // foreach ($semua_aktivitas as $kd => $vd) {
-        $soal = $this->GeneralApiModel->getWhereMaster(array('id_aktivitas'=>$hasil_aktivitas->id_aktivitas), "masterdata_soal_aktivitas")->result();
+      $semua_aktivitas = $this->AktivitasApiModel->getAktivitasPerSoal(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan, 'cdate >='=>$sdate, 'cdate <='=>$edate))->result();
+
+      foreach ($semua_aktivitas as $kd => $vd) {
+        $soal = $this->GeneralApiModel->getWhereMaster(array('id'=>$vd->id_soal), "masterdata_soal_aktivitas")->result();
         foreach ($soal as $ks => $vs) {
-          $jawaban = $this->GeneralApiModel->getWhereMaster(array('id_soal'=>$vs->id), "masterdata_pilihan_jawaban_aktivitas")->result();
+          $jawaban = $this->GeneralApiModel->getWhereTransactional(array('id_soal'=>$vs->id, "id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan, 'cdate >='=>$sdate, 'cdate <='=>$edate), "transactional_hasil_aktivitas")->result();
           foreach ($jawaban as $kj => $vj) {
-            array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
+            $nama = $this->GeneralApiModel->getWhereMaster(array('id'=>$vj->id_jawaban), "masterdata_pilihan_jawaban_aktivitas")->result();
+            array_push($list_jawaban, array("tipe"=>$vs->tipe, "nilai"=>($vj->nilai==1?true:false), "jawaban"=>$nama[0]->jawaban));
           }
-          array_push($list_soal, array("soal"=>$vs->soal, "data_jawaban"=>$list_jawaban));
+          $topik = $this->GeneralApiModel->getWhereMaster(array('id'=>$vs->id_topik), 'masterdata_topik')->result();
+          array_push($list_soal, array("soal"=>$vs->soal, "id_topik"=>$topik[0]->id, "topik"=>$topik[0]->nama,"data_jawaban"=>$list_jawaban));
           $list_jawaban = array();
         }
-        // $list_soal = array();
-      //   array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>"Nama kegiatan", "list_soal"=>$list_soal));
-      // }
+        array_push($list_aktivitas, $list_soal);
+        $list_soal = array();
+      }
+
+      $p_aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan),'cdate','DESC','transactional_hasil_aktivitas')->result();
+  		$p_aktivitas = ($p_aktivitas?$p_aktivitas[0]:null);
+
+  		$p_grading = $this->GeneralApiModel->getWhereMaster(array("id"=>$p_aktivitas->id_aktivitas), 'masterdata_aktivitas')->result();
+  		$p_grading = ($p_grading?$p_grading[0]:null);
+
+      $p_user = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_user), 'transactional_user')->result();
+  		$p_user = ($p_user?$p_user[0]:null);
+
+  		$p_pembina = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_pembina), 'transactional_user')->result();
+  		$p_pembina = ($p_pembina?$p_pembina[0]:null);
+
+      $html  = '<h3 style="text-align:center;">REPORT AKTIVITAS HARIAN</h3>';
+      $html .= '<h5 style="text-align:center; text-transform:capitalize;">Nama Aktivitas : Aktivitas '.($p_grading?$p_grading->nama:null).'</h5>';
+      $html .= '<h5 style="text-align:center; text-transform:capitalize;">Nama Keluarga : '.($p_user?$p_user->namalengkap:null).'</h5>';
+      $html .= '<h5 style="text-align:center; text-transform:capitalize;">Nama Pembina : '.($p_pembina?$p_pembina->namalengkap:null).'</h5>';
+      $html .= '<h5 style="text-align:center;">Tanggal : '.$tgl_aktivitas.'</h5>';
+      $html .= '<h4 style=""></h4>';
+      $html .= '<h4 style=""></h4>';
+
+      $i = 1;
+      $id_topik_temp = 0;
+      foreach ($semua_aktivitas as $kd => $vd) {
+        $soal = $this->GeneralApiModel->getWhereMaster(array('id'=>$vd->id_soal), "masterdata_soal_aktivitas")->result();
+        foreach ($soal as $ks => $vs) {
+          $p_topik = $this->GeneralApiModel->getWhereMaster(array("id"=>$vs->id_topik), 'masterdata_topik')->result();
+          $id_topik = $p_topik[0]->id;
+          if ($id_topik!=$id_topik_temp) {
+            $html .= '<h4 style="">'.$i++.'. '.$p_topik[0]->nama.'</h4>';
+          } else {
+            $html .= '<h4 style=""></h4>';
+          }
+          $html .= '<label style="text-decoration:underline; border-bottom:3px solid black;"><b><u>'.$vs->soal.'</u></b></label><br/>';
+          $id_topik_temp = $id_topik;
+          $jawaban = $this->GeneralApiModel->getWhereTransactional(array('id_soal'=>$vs->id, "id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan, 'cdate >='=>$sdate, 'cdate <='=>$edate), "transactional_hasil_aktivitas")->result();
+          foreach ($jawaban as $kj => $vj) {
+            $nama = $this->GeneralApiModel->getWhereMaster(array('id'=>$vj->id_jawaban), "masterdata_pilihan_jawaban_aktivitas")->result();
+            $html .= '<table><tr>';
+            if ($vs->tipe==0) {
+              $detail_jawaban = '<td>'.$nama[0]->jawaban.'</td><td><b>('.($vj->nilai==1?'Ya':'Tidak').')</b></td>';
+            } else {
+              if ($vj->nilai==1) {
+                $detail_jawaban = '<td>'.$nama[0]->jawaban.'</td><td></td>';
+              } else {
+                continue;
+              }
+            }
+            $html .= $detail_jawaban.'<td></td>';
+            $html .= '</tr></table>';
+          }
+        }
+      }
 
       $result = array(
-        'cdate'=>'',
-        'file_pdf'=>'',
-        'data_record'=>''
+        'file_pdf'=>$this->cetak($html, $tgl_aktivitas),
+        'data_record'=>$list_aktivitas
       );
 
-      // $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => ($list_soal?$list_soal[0]:null)));
-      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => count($semua_aktivitas).'-'.count($soal)));
+      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
     } else {
-      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas / id pelatihan / id pembina salah!', 'data' => null));
+      $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas / id pelatihan / id pembina / tanggal salah!', 'data' => null));
     }
   }
 
@@ -293,5 +346,20 @@ class AktivitasApiController extends REST_Controller {
     $day = $interval->format('%d');
 
     return $day;
+  }
+
+  function cetak($html, $tgl){
+    $pdf = new Pdf('P', 'mm', 'A4', true, 'UTF-8', false);
+    $pdf->SetTitle('Contoh');
+    $pdf->SetMargins(20,20,20,20);
+    // $pdf->SetTopMargin(20);
+    $pdf->setFooterMargin(20);
+    $pdf->SetAutoPageBreak(true);
+    $pdf->SetAuthor('Author');
+    $pdf->SetDisplayMode('real', 'default');
+    $pdf->AddPage();
+
+    $pdf->writeHTML($html, true, false, true, false, '');
+    return $pdf->Output('Laporan Harian '.$tgl.'.pdf', 'E');
   }
 }
