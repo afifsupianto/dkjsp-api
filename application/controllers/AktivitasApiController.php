@@ -289,7 +289,7 @@ class AktivitasApiController extends REST_Controller {
             $nama = $this->GeneralApiModel->getWhereMaster(array('id'=>$vj->id_jawaban), "masterdata_pilihan_jawaban_aktivitas")->result();
             $html .= '<table><tr>';
             if ($vs->tipe==0) {
-              $detail_jawaban = '<td>'.$nama[0]->jawaban.'</td><td><b>('.($vj->nilai==1?'Ya':'Tidak').')</b></td>';
+              $detail_jawaban = '<td>'.$nama[0]->jawaban.'</td><td><b>('.($vj->nilai==1?'Ya':'Tidak').')</b></td><td></td>';
             } else {
               if ($vj->nilai==1) {
                 $detail_jawaban = '<td>'.$nama[0]->jawaban.'</td><td></td>';
@@ -297,14 +297,17 @@ class AktivitasApiController extends REST_Controller {
                 continue;
               }
             }
-            $html .= $detail_jawaban.'<td></td>';
+            $html .= $detail_jawaban;
             $html .= '</tr></table>';
           }
         }
       }
 
+      $cetak = $this->cetak($html, $tgl_aktivitas);
+      $pisah = explode('pdf',$cetak);
+      $file_pdf = substr($pisah[count($pisah)-1],2);
       $result = array(
-        'file_pdf'=>$this->cetak($html, $tgl_aktivitas),
+        'file_pdf'=>$file_pdf,
         'data_record'=>$list_aktivitas
       );
 
@@ -350,12 +353,12 @@ class AktivitasApiController extends REST_Controller {
 
   function cetak($html, $tgl){
     $pdf = new Pdf('P', 'mm', 'A4', true, 'UTF-8', false);
-    $pdf->SetTitle('Contoh');
+    $pdf->SetTitle('File');
     $pdf->SetMargins(20,20,20,20);
     // $pdf->SetTopMargin(20);
     $pdf->setFooterMargin(20);
     $pdf->SetAutoPageBreak(true);
-    $pdf->SetAuthor('Author');
+    $pdf->SetAuthor('DKJPS');
     $pdf->SetDisplayMode('real', 'default');
     $pdf->AddPage();
 
