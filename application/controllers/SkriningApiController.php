@@ -19,20 +19,26 @@ class SkriningApiController extends REST_Controller {
     $where = array(
       'id' => $this->input->post('id_skrining')
     );
+    $id_user = $this->input->post('id_user');
+    $id_kelas = $this->input->post('id_kelas');
+    $id_pelatihan = $this->input->post('id_pelatihan');
     $user = array(
       'id' => $this->input->post('id_user')
     );
-    if(!empty($where['id']) && !empty($user['id'])){
-      $result = $this->GeneralApiModel->getWhereMaster($where, "masterdata_skrining")->row();
+    if(!empty($id_kelas)  && !empty($id_kelas) && !empty($id_user)){
+      $semua_kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+      $kondisi = ($semua_kondisi?$semua_kondisi[0]:null);
+
+      $result = $this->GeneralApiModel->getWhereMaster(array('id'=>($kondisi?$kondisi->id_skrining:0), "masterdata_skrining")->row();
       $user = $this->GeneralApiModel->getWhereTransactional($user, "user_provinsi_kota")->row();
       if(!empty($result) && !empty($user)){
         $data = array(
-          'id' => $where['id'],
+          'id' => ($kondisi?$kondisi->id_skrining:0),
           'nama' => $result->nama
         );
 
         $data['sub_skrining'] = array();
-        $where2 = array('id_skrining' => $where['id']);
+        $where2 = array('id_skrining' => ($kondisi?$kondisi->id_skrining:0));
         $result2 = $this->GeneralApiModel->getWhereMaster($where2, "masterdata_sub_skrining")->result();
 
         $i = 0;

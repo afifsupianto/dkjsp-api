@@ -246,7 +246,7 @@ class AktivitasApiController extends REST_Controller {
           array_push($list_soal, array("soal"=>$vs->soal, "id_topik"=>$topik[0]->id, "topik"=>$topik[0]->nama,"data_jawaban"=>$list_jawaban));
           $list_jawaban = array();
         }
-        array_push($list_aktivitas, $list_soal);
+        array_push($list_aktivitas, $list_soal[0]);
         $list_soal = array();
       }
 

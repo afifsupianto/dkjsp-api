@@ -56,7 +56,7 @@ class PesertaApiController extends REST_Controller
         array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
       }
 
-      $list_materi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_kelas"=>$id_kelas),"id_materi","ASC","list_materi_jadwal")->result();
+      $list_materi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_kelas"=>$id_kelas, "id_user"=>$id_user),"id_materi","ASC","list_materi_jadwal")->result();
 
       $i = 0;
       foreach($list_materi as $row){
@@ -108,6 +108,7 @@ class PesertaApiController extends REST_Controller
           'is_sudah_isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null)
         ),
         'list_materi' => $materi["list_materi"],
+        // 'list_materi' => count($list_materi),
         'list_keluargabinaan' => $list_binaan,
         'list_kader' => $list_kader
       );
