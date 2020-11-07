@@ -22,7 +22,7 @@ class PesertaApiController extends REST_Controller
     $time_expired=60*60*24*3;
     $time_aweek=$time_expired*2;
     header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
-    $id_kelas = array(
+    $where = array(
       'id_kelas' => $this->input->post('id_kelas'),
       'id_user' => $this->input->post('id_user')
     );
@@ -56,7 +56,7 @@ class PesertaApiController extends REST_Controller
         array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
       }
 
-      $list_materi = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_kelas"=>$id_kelas, "id_user"=>$id_user),"id_materi","ASC","list_materi_jadwal")->result();
+      $list_materi = $this->GeneralApiModel->getWhereTransactionalOrdered($where,"id_materi","ASC","list_materi_jadwal")->result();
 
       $i = 0;
       foreach($list_materi as $row){
