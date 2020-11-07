@@ -127,6 +127,8 @@ class PesertaApiController extends REST_Controller
       'id_kelas' => $this->input->post('id_kelas'),
       'id_user' => $this->input->post('id_user')
     );
+
+
     if(!empty($id_kelas['id_kelas']) && !empty($id_kelas['id_user'])){
       $data = array();
       $result = $this->GeneralApiModel->getWhereTransactional(array("id_kelas" => $this->input->post('id_kelas')), "kelas_pelatihan")->row();
@@ -476,19 +478,15 @@ class PesertaApiController extends REST_Controller
         $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
       }
     }
-
+    
     function date_diff($date){
-      $dob = new DateTime($date);
       $now = new DateTime();
+      $now = date_format($now, 'Y-m-d');
 
-      $datetime1 = date_create($dob->format('Y-m-d'));
-      $datetime2 = date_create($now->format('Y-m-d'));
+      $diff = abs(strtotime($now) - strtotime($date));
+      $hari = (strtotime($now) - strtotime($date))/60/60/24;
 
-      $interval = date_diff($datetime1, $datetime2);
-
-      $day = $interval->format('%d');
-
-      return $day;
+      return $hari;
     }
 
     function get_umur($date){

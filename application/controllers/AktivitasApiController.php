@@ -202,9 +202,10 @@ class AktivitasApiController extends REST_Controller {
       $list_aktivitas = array_merge($list_presensi, $list_laporan, $list_materi,$list_kondisi);
 
       $result = array(
-        'total_absent'=>$this->date_diff($gabung->tgl_join)+1-count($semua_presensi),
+        'total_absent'=>$this->date_diff($gabung->tgl_join)-count($semua_presensi),
+        // 'total_absent'=>$this->date_diff($gabung->tgl_join),
         'total_presensi'=>count($semua_presensi),
-        'total_hari'=>$this->date_diff($gabung->tgl_join)+1,
+        'total_hari'=>$this->date_diff($gabung->tgl_join),
         'isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null),
         'list_aktivitas'=>$list_aktivitas
       );
@@ -338,17 +339,13 @@ class AktivitasApiController extends REST_Controller {
   }
 
   function date_diff($date){
-    $dob = new DateTime($date);
     $now = new DateTime();
+    $now = date_format($now, 'Y-m-d');
 
-    $datetime1 = date_create($dob->format('Y-m-d'));
-    $datetime2 = date_create($now->format('Y-m-d'));
+    $diff = abs(strtotime($now) - strtotime($date));
+    $hari = (strtotime($now) - strtotime($date))/60/60/24;
 
-    $interval = date_diff($datetime1, $datetime2);
-
-    $day = $interval->format('%d');
-
-    return $day;
+    return $hari;
   }
 
   function cetak($html, $tgl){
