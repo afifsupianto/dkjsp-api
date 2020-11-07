@@ -330,12 +330,12 @@ class AktivitasApiController extends REST_Controller {
     $day = $interval->format('%d');
     $hour = $interval->format('%h');
 
-    $to_hour = ($day*24)+$hour;
-    $result = (14*24)-$to_hour;
-    $day = intval($result/24);
-    $hour = $result%24;
-
     return array('hari'=>$day, 'jam'=>$hour);
+    // $to_hour = ($day*24)+$hour;
+    // $result = (14*24)-$to_hour;
+    // $day = intval($result/24);
+    // $hour = $result%24;
+
   }
 
   function date_diff($date){
@@ -345,7 +345,7 @@ class AktivitasApiController extends REST_Controller {
     $diff = abs(strtotime($now) - strtotime($date));
     $hari = (strtotime($now) - strtotime($date))/60/60/24;
 
-    return $hari;
+    return intval($hari);
   }
 
   function cetak($html, $tgl){

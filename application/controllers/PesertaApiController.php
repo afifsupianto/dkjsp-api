@@ -101,6 +101,7 @@ class PesertaApiController extends REST_Controller
         'presensi_terakhir' => array(
           'waktu'=>($presensi?$presensi->cdate:null),
           'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)
+          // 'is_sudah_presensi'=>$this->date_diff($presensi->cdate)
         ),
         'laporan_harian_terakhir' => array(
           'id'=> ($aktivitas?$aktivitas->id_aktivitas:null),
@@ -478,7 +479,7 @@ class PesertaApiController extends REST_Controller
         $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
       }
     }
-    
+
     function date_diff($date){
       $now = new DateTime();
       $now = date_format($now, 'Y-m-d');
@@ -486,7 +487,7 @@ class PesertaApiController extends REST_Controller
       $diff = abs(strtotime($now) - strtotime($date));
       $hari = (strtotime($now) - strtotime($date))/60/60/24;
 
-      return $hari;
+      return intval($hari);
     }
 
     function get_umur($date){
