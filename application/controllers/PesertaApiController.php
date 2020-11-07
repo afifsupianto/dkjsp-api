@@ -65,7 +65,7 @@ class PesertaApiController extends REST_Controller
         $materi['list_materi'][$i]['jumlah_subbab'] = $row->jml_subbab;
         $materi['list_materi'][$i]['jumlah_subbab_selesai'] = $row->jml_subbab_selesai;
         if($row->status_buka == 1){
-          if(($row->jml_subbab == $row->jml_subbab_selesai) && $row->jml_subbab != 0){
+          if(($row->jml_subbab == $row->jml_subbab_selesai) && $row->jml_subbab <= 0){
             $materi['list_materi'][$i]['status'] = 2;
           } else {
             $materi['list_materi'][$i]['status'] = 1;
@@ -153,7 +153,7 @@ class PesertaApiController extends REST_Controller
           $data['list_materi'][$i]['jumlah_subbab'] = $row->jml_subbab;
           $data['list_materi'][$i]['jumlah_subbab_selesai'] = $row->jml_subbab_selesai;
           if($row->status_buka == 1){
-            if(($row->jml_subbab == $row->jml_subbab_selesai) && $row->jml_subbab != 0){
+            if(($row->jml_subbab == $row->jml_subbab_selesai) && $row->jml_subbab <= 0){
               $data['list_materi'][$i]['status'] = 2;
             }else{
               $data['list_materi'][$i]['status'] = 1;

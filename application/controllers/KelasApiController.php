@@ -9,7 +9,7 @@ class KelasApiController extends REST_Controller {
 
     function __construct($config = 'rest') {
         parent::__construct($config);
-        date_default_timezone_set("Asia/Jakarta"); 
+        date_default_timezone_set("Asia/Jakarta");
         $this->dateToday = date("Y-m-d");
         $this->timeToday = date("h:i:s");
         $this->load->model("GeneralApiModel");
@@ -41,9 +41,9 @@ class KelasApiController extends REST_Controller {
                 'id_kelas' => $data['id_kelas'],
                 'id_pelatihan' => $data['id_pelatihan']
             );
-    
+
             $exist = $this->GeneralApiModel->isDataTransactionalExist($exist_check, "transactional_kode_referal");
-    
+
             if(!$exist){
                 $insert = $this->GeneralApiModel->insertTransactional($data, "transactional_kode_referal");
                 $this->response(array('status' => 200, 'message' => 'Gabung Kelas Berhasil!', 'data' => $insert));
@@ -117,7 +117,7 @@ class KelasApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Input  kelas sukses!', 'data' => $insert));
         }
     }
-    
+
     function submitPresensi_post(){
         $data = array(
             'id_pelatihan' => $this->input->post('id_pelatihan'),
@@ -132,11 +132,11 @@ class KelasApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Form presensi tidak lengkap! submit presensi gagal', 'data' => null));
         }
     }
-    
+
     function submitTopikSelesai_post(){
         $data = array(
             'id_materi' => $this->input->post('id_materi'),
-            'id_subbab_materi' => $this->input->post('id_subbab_materi'), 
+            'id_subbab_materi' => $this->input->post('id_subbab_materi'),
             'id_user' => $this->input->post('id_user')
         );
         if($data['id_materi'] && $data['id_subbab_materi'] && $data['id_user']){
@@ -147,7 +147,7 @@ class KelasApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Form input progress tidak lengkap! submit progress materi gagal', 'data' => null));
         }
     }
-    
+
     function submitTest_post(){
         $data_jawaban = $this->post('data_jawaban');
         $id_subbab_materi = $this->post('id_subbab_materi');
@@ -181,19 +181,19 @@ class KelasApiController extends REST_Controller {
                     'id_materi' => $id_materi->id_materi,
                     'id_subbab_materi' => $data['id_subbab_materi']
                 );
-                
+
                 $hasil_test = array(
                     'jml_soal' => $jumlah_soal,
                     'jml_benar' => $jumlah_benar
                 );
-                
+
                 $data_exist = $this->GeneralApiModel->isDataTransactionalExist($progress, "transactional_progress_materi");
                 if($data_exist){
                     $this->response(array('status' => 200, 'message' => 'test sudah dilakukan!', 'data' => null));
                 }
                 else{
                     $insert = $this->GeneralApiModel->insertTransactional($progress, "transactional_progress_materi");
-                    
+
                     $log_test = array(
                         'tanggal' => $this->dateToday." ".$this->timeToday,
                         'jumlah_soal' => $hasil_test['jml_soal'],
@@ -203,15 +203,15 @@ class KelasApiController extends REST_Controller {
                         'id_subbab_materi' => $progress['id_subbab_materi']
                     );
                     $insert_log_test = $this->GeneralApiModel->insertIdTransactional($log_test, "transactional_test");
-                    
+
                     for($i = 0; $i < count($data_jawaban); $i++){
                         $data_jawaban[$i]['id_trans_test'] = $insert_log_test;
                     }
                     $insert_data_jawaban = $this->GeneralApiModel->insertBatchTransactional($data_jawaban, "transactional_list_jawaban_test");
-                    
+
                     $this->response(array('status' => 200, 'message' => 'Input  test sukses!', 'data' => $hasil_test));
                 }
-                
+
             }else{
                 $this->response(array('status' => 200, 'message' => 'id subbab tidak ditemukan!', 'data' => null));
             }
@@ -220,7 +220,7 @@ class KelasApiController extends REST_Controller {
         }
         //$this->response(array('status' => 200, 'message' => 'test', 'data' => $data_jawaban));
     }
-    
+
     function dataKodeReferal_post(){
         $data = array(
             'id_pelatihan' => $this->input->post('id_pelatihan'),
@@ -235,10 +235,10 @@ class KelasApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'id yang diperlukan tidak lengkap! data gagal ditampilkan', 'data' => null));
         }
     }
-    
+
     function perbaruiReferal_post(){
         $kode_referal = random_string('alnum', 6);
-        
+
         $id_user = $this->input->post('id_user');
         $where = array(
             'id_user' => $id_user,
@@ -259,7 +259,7 @@ class KelasApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Peserta tidak ditemukan! Kode Referal Gagal Diperbarui', 'data' => null));
         }
     }
-    
+
     function dataTest_post(){
         $where = array(
             'id_subbab_materi' => $this->input->post('id_subbab_materi')
@@ -278,21 +278,20 @@ class KelasApiController extends REST_Controller {
                     $data['data_soal'][$i]['tipe'] = $row->tipe;
                     $data['data_soal'][$i]['id_subbab_materi'] = $row->id_subbab_materi;
                     $data['data_soal'][$i]['data_jawaban'] = array();
-                    
+
                     $where2 = array(
                         'id_test' => $row->id
                     );
-                    
+
                     $result2 = $this->GeneralApiModel->getWhereMaster($where2, "masterdata_pilihan_jawaban_test")->result();
                     $j = 0;
                     foreach($result2 as $row){
                         $data['data_soal'][$i]['data_jawaban'][$j]['id'] = $row->id;
                         $data['data_soal'][$i]['data_jawaban'][$j]['jawaban'] = $row->jawaban;
-                        $data['data_soal'][$i]['data_jawaban'][$j]['is_benar'] = $row->is_benar;
-                        
+                        $data['data_soal'][$i]['data_jawaban'][$j]['is_benar'] = $row->is_benar;                        
                         $j++;
                     }
-                    
+
                     $i++;
                 }
                 $this->response(array('status' => 200, 'message' => 'Data test berhasil didapatkan!', 'data' => $data));
