@@ -125,26 +125,39 @@ class PesertaApiController extends REST_Controller
     $time_aweek=$time_expired*2;
     header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
     $id_kelas = array(
+      'id_pelatihan' => $this->input->post('id_pelatihan'),
       'id_kelas' => $this->input->post('id_kelas'),
       'id_user' => $this->input->post('id_user')
     );
+    $id_user = $this->input->post('id_user');
+    $id_pelatihan = $this->input->post('id_pelatihan');
 
 
-    if(!empty($id_kelas['id_kelas']) && !empty($id_kelas['id_user'])){
+    if(!empty($id_kelas['id_kelas']) && !empty($id_kelas['id_user']) && !empty($id_kelas['id_pelatihan'])){
       $data = array();
       $result = $this->GeneralApiModel->getWhereTransactional(array("id_kelas" => $this->input->post('id_kelas')), "kelas_pelatihan")->row();
       if(!empty($result)){
+        $histori_test = $this->GeneralApiModel->getWhereTransactionalOrdered(array('id_user'=>$id_user, 'id_kelas'=>$id_kelas['id_kelas'], 'id_pelatihan'=>$id_pelatihan),'cdate','ASC','transactional_test')->result();
+        $list_test = array();
+        $tot_nilai = 0;
+        $materi_terkahir = '';
+        foreach ($histori_test as $h) {
+          $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
+          $tot_nilai+=$h->jumlah_benar;
+          $materi_terkahir = $judul;
+          array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>$h->jumlah_benar, 'tgl_buat'=>$h->cdate));
+        }
+
         $data['deskripsi_pelatihan'] = $result->deskripsi_pelatihan;
-        $data['jml_materi_dipelajari'] = "3";
-        $data['judul_materi_terakhir'] = "COVID-19";
+        $data['judul_materi_terakhir'] = $judul;
         $data['jumlah_anggota_kelas'] = $result->jumlah_peserta; //buat view counting di kode referal where role = 0
         $data['nama_kelas'] = $result->nama_kelas;
-        $data['nilai_rata_seluruh_test'] = "76";
+        $data['nilai_rata_seluruh_test'] = ($tot_nilai/count($histori_test));
         $tgl_buka = date("d-m-Y", strtotime($result->tgl_buka));
         $tgl_selesai = date("d-m-Y", strtotime($result->tgl_selesai));
         $data['periode_kelas'] = strval($tgl_buka)." - ".strval($tgl_selesai); //tgl buka - tgl selesai
-        $data['status_kelas'] = "1";
-        $data['list_riwayat_test']=array();
+        $data['status_kelas'] = $result->status_kelas;
+        $data['list_riwayat_test'] = $list_test;
         $data['list_materi'] = array();
 
         $result = $this->GeneralApiModel->getWhereTransactionalOrdered($id_kelas,"id_materi","ASC","list_materi_jadwal")->result();
@@ -181,7 +194,7 @@ class PesertaApiController extends REST_Controller
           }
           $i++;
         }
-
+        $data['jml_materi_dipelajari'] = $i;
         $this->response(array('status' => 200, 'message' => 'data diterima', 'data' => $data));
       }else{
         $this->response(array('status' => 200, 'message' => 'pencarian kelas berdasarkan id tidak ditemukan', 'data' => null));

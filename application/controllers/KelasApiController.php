@@ -152,12 +152,16 @@ class KelasApiController extends REST_Controller {
         $data_jawaban = $this->post('data_jawaban');
         $id_subbab_materi = $this->post('id_subbab_materi');
         $id_user = $this->post('id_user');
+        $id_kelas = $this->post('id_kelas');
+        $id_pelatihan = $this->post('id_pelatihan');
         $data = array(
             'data_jawaban' => $data_jawaban,
             'id_subbab_materi' => $id_subbab_materi,
-            'id_user' => $id_user
+            'id_user' => $id_user,
+            'id_kelas' => $id_kelas,
+            'id_pelatihan' => $id_pelatihan
         );
-        if(!empty($data_jawaban) && !empty($id_subbab_materi) && !empty($id_user)){
+        if(!empty($data_jawaban) && !empty($id_subbab_materi) && !empty($id_user) && !empty($id_kelas) && !empty($id_pelatihan)){
             $query = $this->GeneralApiModel->getWhereTransactional(array('id_subbab_materi' => $id_subbab_materi),"counting_jumlah_soal_test")->row();
             $jumlah_soal = $query->jumlah_soal;
             if(!empty($jumlah_soal)){
@@ -179,7 +183,9 @@ class KelasApiController extends REST_Controller {
                 $progress = array(
                     'id_user' => $data['id_user'],
                     'id_materi' => $id_materi->id_materi,
-                    'id_subbab_materi' => $data['id_subbab_materi']
+                    'id_subbab_materi' => $data['id_subbab_materi'],
+                    'id_kelas' => $data['id_kelas'],
+                    'id_pelatihan' => $data['id_pelatihan']
                 );
 
                 $hasil_test = array(
@@ -200,7 +206,9 @@ class KelasApiController extends REST_Controller {
                         'jumlah_benar' => $hasil_test['jml_benar'],
                         'id_user' => $progress['id_user'],
                         'id_materi' => $progress['id_materi'],
-                        'id_subbab_materi' => $progress['id_subbab_materi']
+                        'id_subbab_materi' => $progress['id_subbab_materi'],
+                        'id_pelatihan' => $progress['id_pelatihan'],
+                        'id_kelas' => $progress['id_kelas']
                     );
                     $insert_log_test = $this->GeneralApiModel->insertIdTransactional($log_test, "transactional_test");
 
@@ -216,7 +224,7 @@ class KelasApiController extends REST_Controller {
                 $this->response(array('status' => 200, 'message' => 'id subbab tidak ditemukan!', 'data' => null));
             }
         }else{
-            $this->response(array('status' => 200, 'message' => 'submit test gagal dilakukan!', 'data' => null));
+            $this->response(array('status' => 200, 'message' => 'submit test gagal dilakukan, cek id user / id subbab / id kelas / id pelatihan / data jawaban!', 'data' => null));
         }
         //$this->response(array('status' => 200, 'message' => 'test', 'data' => $data_jawaban));
     }
@@ -288,7 +296,7 @@ class KelasApiController extends REST_Controller {
                     foreach($result2 as $row){
                         $data['data_soal'][$i]['data_jawaban'][$j]['id'] = $row->id;
                         $data['data_soal'][$i]['data_jawaban'][$j]['jawaban'] = $row->jawaban;
-                        $data['data_soal'][$i]['data_jawaban'][$j]['is_benar'] = $row->is_benar;                        
+                        $data['data_soal'][$i]['data_jawaban'][$j]['is_benar'] = $row->is_benar;
                         $j++;
                     }
 
