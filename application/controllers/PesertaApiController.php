@@ -140,12 +140,23 @@ class PesertaApiController extends REST_Controller
         $histori_test = $this->GeneralApiModel->getWhereTransactionalOrdered(array('id_user'=>$id_user, 'id_kelas'=>$id_kelas['id_kelas'], 'id_pelatihan'=>$id_pelatihan),'cdate','ASC','transactional_test')->result();
         $list_test = array();
         $tot_nilai = 0;
+        $pre = 0;
+        $post = 0;
         foreach ($histori_test as $h) {
           $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
+          $tipe = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_subbab_materi),'masterdata_subbab_materi')->result()[0]->judul;
+          if (strtolower($tipe)=='pretest') {
+            $pre++;
+          } else {
+            $post++;
+          }
           $tot_nilai+=$h->jumlah_benar;
           array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>$h->jumlah_benar, 'tgl_buat'=>$h->cdate));
         }
 
+        $data['jumlah_pretest'] = $pre;
+        $data['jumlah_posttest'] = $post;
+        $data['jumlah_benar'] = $tot_nilai;
         $data['deskripsi_pelatihan'] = $result->deskripsi_pelatihan;
         $data['judul_materi_terakhir'] = $judul;
         $data['jumlah_anggota_kelas'] = $result->jumlah_peserta; //buat view counting di kode referal where role = 0
