@@ -151,7 +151,7 @@ class PesertaApiController extends REST_Controller
             $post++;
           }
           $tot_nilai+=$h->jumlah_benar;
-          array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>$h->jumlah_benar, 'tgl_buat'=>$h->cdate));
+          array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>number_format(($h->jumlah_benar/$h->jumlah_soal)*100, 2), 'tgl_buat'=>$h->cdate));
         }
 
         $data['jumlah_pretest'] = $pre;
