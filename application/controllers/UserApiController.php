@@ -99,4 +99,16 @@ class UserApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Tidak ada data Pemateri yang ditemukan!', 'data' => $result));
         }
     }
+
+    function cekData_post(){
+      $tipe = $this->input->post('tipe');
+      $nilai = $this->input->post('nilai');
+
+      $result = $this->GeneralApiModel->getWhereTransactional(array($tipe=>$nilai), 'transactional_user')->result();
+      if (count($result)>0) {
+        $this->response(array('status' => 200, 'message' => 'Data Sudah Ada', 'data' => true));
+      } else {
+        $this->response(array('status' => 200, 'message' => 'Data Belum Ada', 'data' => false));
+      }
+    }
 }

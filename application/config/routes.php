@@ -88,15 +88,10 @@ $route['api/master/hapus-materi'] = 'MasterApiController/hapusMasterMateri';
 $route['api/master/list-materi'] = 'MasterApiController/showSemuaMasterMateri';
 
 $route['api/user/list-admin'] = 'UserApiController/showSemuaUserAdmin';
-
 $route['api/user/list-operator'] = 'UserApiController/showSemuaUserOperator';
-
 $route['api/user/list-pemateri'] = 'UserApiController/showSemuaUserPemateri';
-
 $route['api/user/list-panitia'] = 'UserApiController/showSemuaUserPanitia';
-
 $route['api/user/list-peserta'] = 'UserApiController/showSemuaUserPeserta';
-
 $route['api/user/list-kader'] = 'UserApiController/showSemuaUserKader';
-
 $route['api/user/list-keluarga-binaan'] = 'UserApiController/showSemuaUserKeluargaBinaan';
+$route['api/user/cek-data'] = 'UserApiController/cekData';

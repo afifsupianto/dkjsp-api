@@ -139,11 +139,8 @@ class PesertaApiController extends REST_Controller
       if(!empty($result)){
         $histori_test = $this->GeneralApiModel->getWhereTransactionalOrdered(array('id_user'=>$id_user, 'id_kelas'=>$id_kelas['id_kelas'], 'id_pelatihan'=>$id_pelatihan),'cdate','ASC','transactional_test')->result();
         $list_test = array();
-        $tot_nilai = 0;
-        $pre_soal = 0;
-        $pre_benar = 0;
-        $post_soal = 0;
-        $post_benar = 0;
+        $tot_nilai = 0; $pre_soal = 0; $pre_benar = 0; $post_soal = 0; $post_benar = 0;
+
         foreach ($histori_test as $h) {
           $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
           $tipe = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_subbab_materi),'masterdata_subbab_materi')->result()[0]->judul;
@@ -162,12 +159,12 @@ class PesertaApiController extends REST_Controller
         $post = $post_benar==0?0:number_format(($post_benar/$post_soal)*100,2);
         $data['jumlah_pretest'] = $pre;
         $data['jumlah_posttest'] = $post;
-        $data['jumlah_benar'] = number_format(($pre+$post)/2,2);
+        // $data['jumlah_benar'] = number_format(($pre+$post)/2,2);
         $data['deskripsi_pelatihan'] = $result->deskripsi_pelatihan;
         $data['judul_materi_terakhir'] = $judul;
         $data['jumlah_anggota_kelas'] = $result->jumlah_peserta; //buat view counting di kode referal where role = 0
         $data['nama_kelas'] = $result->nama_kelas;
-        $data['nilai_rata_seluruh_test'] = ($tot_nilai/count($histori_test));
+        $data['nilai_rata_seluruh_test'] = number_format(($pre+$post)/2,2);
         $tgl_buka = date("d-m-Y", strtotime($result->tgl_buka));
         $tgl_selesai = date("d-m-Y", strtotime($result->tgl_selesai));
         $data['periode_kelas'] = strval($tgl_buka)." - ".strval($tgl_selesai); //tgl buka - tgl selesai
