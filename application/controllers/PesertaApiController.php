@@ -507,7 +507,7 @@ class PesertaApiController extends REST_Controller
 
     function date_diff($date){
       $now = new DateTime();
-      $now = date_format($now, 'Y-m-d');
+      $now = date_format($now, 'Y-m-d h:m:s');
 
       $diff = abs(strtotime($now) - strtotime($date));
       $hari = (strtotime($now) - strtotime($date))/60/60/24;
