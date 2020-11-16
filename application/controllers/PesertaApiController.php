@@ -387,8 +387,8 @@ class PesertaApiController extends REST_Controller
       // $laporan_aktivitas = array();
       // $total_aktivitas = 0;
       // foreach ($histori_aktivitas as $h) {
-        // $total_aktivitas++;
-        // array_push($laporan_aktivitas, array('id'=>$h->id_aktivitas, 'cdate'=>$h->cdate));
+      // $total_aktivitas++;
+      // array_push($laporan_aktivitas, array('id'=>$h->id_aktivitas, 'cdate'=>$h->cdate));
       // }
 
       $laporan_skrining = array();
@@ -505,27 +505,100 @@ class PesertaApiController extends REST_Controller
       }
     }
 
-    function date_diff($date){
-      $now = new DateTime();
-      $now = date_format($now, 'Y-m-d h:m:s');
+    function detailTest_post(){
+      $time_expired=60*60*24*3;
+      $time_aweek=$time_expired*2;
+      header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+      $id_kelas = array(
+        'id_pelatihan' => $this->input->post('id_pelatihan'),
+        'id_kelas' => $this->input->post('id_kelas'),
+        'id_user' => $this->input->post('id_user')
+      );
+      $id_user = $this->input->post('id_user');
+      $id_pelatihan = $this->input->post('id_pelatihan');
+      $id_kelas = $this->input->post('id_kelas');
+      $id_materi = $this->input->post('id_materi');
 
-      $diff = abs(strtotime($now) - strtotime($date));
-      $hari = (strtotime($now) - strtotime($date))/60/60/24;
 
-      return intval($hari);
+      if(!empty($id_kelas) && !empty($id_user) && !empty($id_pelatihan) && !empty($id_materi)){
+        $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
+      } else {
+        $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id kelas / id pelatihan / id materi tidak tersedia!', 'data' => null));
+      }
     }
 
-    function get_umur($date){
-      $dob = new DateTime($date);
-      $now = new DateTime();
 
-      $datetime1 = date_create($dob->format('Y-m-d'));
-      $datetime2 = date_create($now->format('Y-m-d'));
+      function laporanPembelajaran_post(){
+        $time_expired=60*60*24*3;
+        $time_aweek=$time_expired*2;
+        header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
 
-      $interval = date_diff($datetime1, $datetime2);
+        $id_user = $this->input->post('id_user');
+        $id_kelas = $this->input->post('id_kelas');
+        $id_pelatihan = $this->input->post('id_pelatihan');
+        $id_materi = $this->input->post('id_materi');
 
-      $year = $interval->format('%y');
+        if(!empty($id_kelas) && !empty($id_user) && !empty($id_pelatihan) && !empty($id_materi)){
+          $data = array();
+          $result = $this->GeneralApiModel->getWhereTransactional(array("id_kelas" => $id_kelas), "kelas_pelatihan")->row();
+          if(!empty($result)){
+            $histori_test = $this->GeneralApiModel->getWhereTransactionalOrdered(array('id_user'=>$id_user, 'id_kelas'=>$id_kelas, 'id_pelatihan'=>$id_pelatihan, 'id_materi'=>$id_materi),'cdate','ASC','transactional_test')->result();
+            $list_test = array();
+            $tot_nilai = 0; $pre_soal = 0; $pre_benar = 0; $post_soal = 0; $post_benar = 0;
 
-      return $year;
-    }
+            foreach ($histori_test as $h) {
+              $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
+              $tipe = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_subbab_materi),'masterdata_subbab_materi')->result()[0]->judul;
+              if (strtolower($tipe)=='pretest') {
+                $pre_soal=$h->jumlah_soal;
+                $pre_benar=$h->jumlah_benar;
+                $tgl_pre = $h->cdate;
+              } else {
+                $post_soal=$h->jumlah_soal;
+                $post_benar=$h->jumlah_benar;
+                $tgl_post = $h->cdate;
+              }
+              // $tot_nilai+=$h->jumlah_benar;
+              array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>number_format(($h->jumlah_benar/$h->jumlah_soal)*100, 2), 'tgl_buat'=>$h->cdate));
+            }
+
+            $pre = $pre_benar==0?0:number_format(($pre_benar/$pre_soal)*100,2);
+            $post = $post_benar==0?0:number_format(($post_benar/$post_soal)*100,2);
+
+            $data['nilai_pretest'] = $pre;
+            $data['nilai_posttest'] = $post;
+            $data['tgl_pretest'] = $tgl_pre;
+            $data['tgl_posttest'] = $tgl_post;
+            $this->response(array('status' => 200, 'message' => 'data diterima', 'data' => $data));
+          }else{
+            $this->response(array('status' => 200, 'message' => 'pencarian kelas berdasarkan id tidak ditemukan', 'data' => null));
+          }
+        }else{
+          $this->response(array('status' => 200, 'message' => 'inputan id kelas/pelatihan/materi/kelas tidak ditemukan!', 'data' => null));
+        }
+      }
+
+  function date_diff($date){
+    $now = new DateTime();
+    $now = date_format($now, 'Y-m-d h:m:s');
+
+    $diff = abs(strtotime($now) - strtotime($date));
+    $hari = (strtotime($now) - strtotime($date))/60/60/24;
+
+    return intval($hari);
   }
+
+  function get_umur($date){
+    $dob = new DateTime($date);
+    $now = new DateTime();
+
+    $datetime1 = date_create($dob->format('Y-m-d'));
+    $datetime2 = date_create($now->format('Y-m-d'));
+
+    $interval = date_diff($datetime1, $datetime2);
+
+    $year = $interval->format('%y');
+
+    return $year;
+  }
+}
