@@ -129,7 +129,7 @@ class AktivitasApiController extends REST_Controller {
         'presensi_terakhir'=>$presensi->cdate,
         'aktivitas_harian_terakhir'=>$aktivitas->cdate,
         'total_aktivitas_harian'=>count($semua_aktivitas),
-        'is_aktivitas_harian'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null),        
+        'is_aktivitas_harian'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null),
         'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
         'id_grading'=>($kondisi?$kondisi->kondisi_fisik:null),
@@ -319,24 +319,15 @@ class AktivitasApiController extends REST_Controller {
   }
 
   function countdown_next($date){
-    $dob = new DateTime($date);
     $now = new DateTime();
-    date_add($dob,date_interval_create_from_date_string("14 days"));
+    $now = date_format($now, 'Y-m-d H:m:s');
 
-    $datetime1 = date_create($dob->format('Y-m-d h:m:s'));
-    $datetime2 = date_create($now->format('Y-m-d h:m:s'));
+    $diff = abs(strtotime($now) - strtotime($date));
+    // $hari = (strtotime($now) - strtotime($date))/60/60/24;
+    $waktu = (strtotime($now) - strtotime($date))/60/60;
 
-    $interval = date_diff($datetime1, $datetime2);
-
-    $day = $interval->format('%d');
-    $hour = $interval->format('%h');
-
-    return array('hari'=>$day, 'jam'=>$hour);
-    // $to_hour = ($day*24)+$hour;
-    // $result = (14*24)-$to_hour;
-    // $day = intval($result/24);
-    // $hour = $result%24;
-
+    // return intval($hari);
+    return array('hari'=>(intval($waktu/24)-14)*-1, 'jam'=>24-intval($waktu%24));
   }
 
   function date_diff($date){
