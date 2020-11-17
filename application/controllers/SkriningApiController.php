@@ -16,29 +16,33 @@ class SkriningApiController extends REST_Controller {
   }
 
   function dataSkrining_post(){
-    $where = array(
-      'id' => $this->input->post('id_skrining')
-    );
+    // $where = array(
+    //   'id' => $this->input->post('id_skrining')
+    // );
     $id_user = $this->input->post('id_user');
     $id_kelas = $this->input->post('id_kelas');
     $id_pelatihan = $this->input->post('id_pelatihan');
-    $user = array(
-      'id' => $this->input->post('id_user')
-    );
-    if(!empty($id_kelas)  && !empty($id_kelas) && !empty($id_user)){
-      $semua_kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
-      $kondisi = ($semua_kondisi?$semua_kondisi[0]:null);
+    $id_skrining = $this->input->post('id_skrining');
+    // $user = array(
+    //   'id' => $this->input->post('id_user')
+    // );
+    if(!empty($id_skrining) && !empty($id_user)){
+      // $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+      // $kondisi = ($kondisi?$kondisi[0]:null);
+      // $result = $this->GeneralApiModel->getWhereMaster(array('id'=>($kondisi?$kondisi->id_skrining:0)), "masterdata_skrining")->row();
 
-      $result = $this->GeneralApiModel->getWhereMaster(array('id'=>($kondisi?$kondisi->id_skrining:0), "masterdata_skrining")->row();
-      $user = $this->GeneralApiModel->getWhereTransactional($user, "user_provinsi_kota")->row();
+      $result = $this->GeneralApiModel->getWhereMaster(array('id'=>$id_skrining), "masterdata_skrining")->row();
+      $user = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user), "user_provinsi_kota")->row();
       if(!empty($result) && !empty($user)){
         $data = array(
-          'id' => ($kondisi?$kondisi->id_skrining:0),
+          // 'id' => ($kondisi?$kondisi->id_skrining:0),
+          'id' => $id_skrining,
           'nama' => $result->nama
         );
 
         $data['sub_skrining'] = array();
-        $where2 = array('id_skrining' => ($kondisi?$kondisi->id_skrining:0));
+        // $where2 = array('id_skrining' => ($kondisi?$kondisi->id_skrining:0));
+        $where2 = array('id_skrining' => $id_skrining);
         $result2 = $this->GeneralApiModel->getWhereMaster($where2, "masterdata_sub_skrining")->result();
 
         $i = 0;
@@ -81,13 +85,12 @@ class SkriningApiController extends REST_Controller {
 
               $j++;
             }
-
             $i++;
           }
         }
 
         $this->response(array('status' => 200, 'message' => 'respond test', 'data' => $data));
-      }else{
+      } else {
         $this->response(array('status' => 200, 'message' => 'Data skrining atau Data User tidak ditemukan', 'data' => null));
       }
     }else{
