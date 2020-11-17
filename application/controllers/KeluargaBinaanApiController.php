@@ -352,4 +352,25 @@ class KeluargaBinaanApiController extends REST_Controller
             $this->response(array('status' => 200, 'message' => 'Status ACC Relawan tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
         }
     }
+
+    function dashboard_post(){
+      $id_user = $this->input->post('id_user');
+      if(!empty($id_user)){
+        $user = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result()[0];
+
+        $result = array(
+          'id_kelas'=>$user->id_kelas,
+          'id_pelatihan'=>$user->id_pelatihan,
+          'nama_pelatihan'=>$user->nama,
+          'deskripsi_pelatihan'=>$user->deskripsi,
+          'nama_pembina'=>$user->nama_pembina,
+          'periode_kelas'=>array('tgl_buka'=>$user->tgl_buka, 'tgl_selesai'=>$user->tgl_selesai),
+          'status_kelas'=>$user->status_kelas,
+          'status_role'=>$user->status_keluarga,
+        );
+        $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
+      } else {
+        $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
+      }
+    }
 }
