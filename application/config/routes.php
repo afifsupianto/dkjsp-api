@@ -46,6 +46,7 @@ $route['api/keluarga-binaan/detail-kader'] = 'keluargaBinaanApiController/detail
 $route['api/keluarga-binaan/updated-kader'] = 'KeluargaBinaanApiController/updatekaderByPeserta';
 $route['api/keluarga-binaan/updated-by-peserta'] = 'KeluargaBinaanApiController/updateKeluargaBinaanByPeserta';
 $route['api/keluarga-binaan/dashboard'] = 'KeluargaBinaanApiController/dashboard';
+$route['api/keluarga-binaan/home'] = 'KeluargaBinaanApiController/home';
 
 //Kelas
 $route['api/kelas/input-kelas'] = 'KelasApiController/masukkanKelas';

@@ -411,8 +411,7 @@ class PesertaApiController extends REST_Controller
           'terakhir_isi_aktivitas'=>($aktivitas?$aktivitas->cdate:null),
           'total_presensi'=>count($histori_presensi),
           'total_laporan'=>count($histori_aktivitas),
-          'laporan_aktivitas'=>$histori_aktivitas,
-          // 'laporan_aktivitas'=>$laporan_aktivitas,
+          'laporan_aktivitas'=>$histori_aktivitas,          
           'laporan_skrining'=>$laporan_skrining,
         );
         $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
