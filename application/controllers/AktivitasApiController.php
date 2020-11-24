@@ -17,6 +17,9 @@ class AktivitasApiController extends REST_Controller {
     }
 
     function dataAktivitas_post(){
+      $time_expired=60*60*24*3;
+      $time_aweek=$time_expired*2;
+      header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
       $user = array(
         'id' => $this->input->post('id_user')
       );
