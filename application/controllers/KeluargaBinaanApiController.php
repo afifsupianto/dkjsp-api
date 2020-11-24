@@ -451,25 +451,36 @@ class KeluargaBinaanApiController extends REST_Controller
     function menu_post(){
       $id_user = $this->input->post('id_user');
       $id_kelas = $this->input->post('id_kelas');
-      $id_pelatihan = $this->input->post('id_pelatihan');
+      $id_peserta = $this->input->post('id_peserta');
+      // $id_pelatihan = $this->input->post('id_pelatihan');
+
       if(!empty($id_user)){
         $list_binaan = array();
         $list_kader = array();
-        $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "ASC", " transactional_binaan")->result();
+        // $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan), "cdate", "ASC", " transactional_binaan")->result();
+        $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user), "cdate", "ASC", " transactional_binaan")->result();
         foreach ($binaan as $b) {
           $no_kk = $b->nomor_kk;
-          $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk), 'user_anggotakeluarga_detail')->result()[0];
-          array_push($list_binaan, array("id"=>$b->id,"nomor_kk"=>$no_kk, "nama"=>$daftar->namalengkap));
+          $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk, "status_keluarga"=>0), 'semua_anggota_keluarga')->result()[0];
+          array_push($list_binaan, array("nama_kepala"=>$daftar->namalengkap, "kabupaten"=>$daftar->nama_kota, "provinsi"=>$daftar->nama_provinsi));
         }
 
-        $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
+        // $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
+        $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
         foreach ($kader as $b) {
-          $id_user = $b->id_user;
-          $daftar = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_user), 'transactional_user')->result()[0];
-          array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
+          // $id_user = $b->id_user;
+          $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk), 'semua_anggota_keluarga')->result()[0];
+          array_push($list_kader, array("nama_kader"=>$daftar->namalengkap, "kabupaten"=>$daftar->nama_kota, "provinsi"=>$daftar->nama_provinsi));
         }
 
+        $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user),'user_provinsi_kota')->result()[0];
         $result = array(
+          "nama_pembina"=> $pembina->namalengkap,
+          "id_pembina"=> $pembina->id,
+          "nohp_pembina"=> $pembina->nohp,
+          "institusi_pembina"=> $pembina->nama_institusi,
+          "kabupaten_pembina"=> $pembina->nama_kota,
+          "provinsi_pembina"=> $pembina->nama_provinsi,
           'list_keluarga_binaan'=>$list_binaan,
           'list_kader_binaan'=>$list_kader
         );
