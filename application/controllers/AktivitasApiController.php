@@ -112,19 +112,19 @@ class AktivitasApiController extends REST_Controller {
         $aktivitas = ($semua_aktivitas?$semua_aktivitas[0]:null);
 
         $list_skrining = array();
-        foreach ($semua_kondisi as $k) {
-          $nama = $this->GeneralApiModel->getWhereMaster(array('id'=>$k->id_skrining), 'masterdata_skrining')->result()[0]->nama;
+        // foreach ($semua_kondisi as $k) {
+          $nama = $this->GeneralApiModel->getWhereMaster(array('id'=>$kondisi->id_skrining), 'masterdata_skrining')->result()[0]->nama;
           array_push($list_skrining,
           array(
             'nama'=>$nama,
             'hasil_test_terakhir'=>array(
               'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
               'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
-              'tanggal_isi' => $k->cdate
+              'tanggal_isi' => $kondisi->cdate
             )
           )
         );
-      }
+      // }
 
       $result = array(
         'is_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null),
@@ -311,7 +311,7 @@ class AktivitasApiController extends REST_Controller {
       $pdf = str_replace($str, '', $cetak);
 
       $result = array(
-        'file_pdf'=>$pdf,        
+        'file_pdf'=>$pdf,
         'data_record'=>$list_aktivitas
       );
 
