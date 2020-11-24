@@ -330,7 +330,9 @@ class AktivitasApiController extends REST_Controller {
     $waktu = (strtotime($now) - strtotime($date))/60/60;
 
     // return intval($hari);
-    return array('hari'=>(intval($waktu/24)-14)*-1, 'jam'=>24-intval($waktu%24));
+    $hari = (intval($waktu/24)+13);
+    $jam = 24-intval($waktu%24);
+    return array('hari'=>$jam==24?$hari+1:$hari, 'jam'=>$jam==24?0:$jam);
   }
 
   function date_diff($date){
