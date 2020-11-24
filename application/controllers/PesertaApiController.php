@@ -141,6 +141,7 @@ class PesertaApiController extends REST_Controller
         $list_test = array();
         $tot_nilai = 0; $pre_soal = 0; $pre_benar = 0; $post_soal = 0; $post_benar = 0;
 
+        $judul = 'Belum Mengerjakan Materi';
         foreach ($histori_test as $h) {
           $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
           $tipe = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_subbab_materi),'masterdata_subbab_materi')->result()[0]->judul;
@@ -411,7 +412,7 @@ class PesertaApiController extends REST_Controller
           'terakhir_isi_aktivitas'=>($aktivitas?$aktivitas->cdate:null),
           'total_presensi'=>count($histori_presensi),
           'total_laporan'=>count($histori_aktivitas),
-          'laporan_aktivitas'=>$histori_aktivitas,          
+          'laporan_aktivitas'=>$histori_aktivitas,
           'laporan_skrining'=>$laporan_skrining,
         );
         $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));

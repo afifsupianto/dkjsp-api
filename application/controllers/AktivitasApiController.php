@@ -327,7 +327,7 @@ class AktivitasApiController extends REST_Controller {
 
     $diff = abs(strtotime($now) - strtotime($date));
     // $hari = (strtotime($now) - strtotime($date))/60/60/24;
-    $waktu = (strtotime($now) - strtotime($date))/60/60;
+    $waktu = (strtotime($now) - strtotime($date))/60/60+1;
 
     // return intval($hari);
     $hari = (intval($waktu/24)+13);
