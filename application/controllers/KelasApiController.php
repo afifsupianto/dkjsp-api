@@ -206,8 +206,8 @@ class KelasApiController extends REST_Controller {
                         'id_user' => $progress['id_user'],
                         'id_materi' => $progress['id_materi'],
                         'id_subbab_materi' => $progress['id_subbab_materi'],
-                        'id_pelatihan' => $progress['id_pelatihan'],
-                        'id_kelas' => $progress['id_kelas']
+                        'id_pelatihan' => $id_pelatihan,
+                        'id_kelas' => $id_kelas
                     );
                     $insert_log_test = $this->GeneralApiModel->insertIdTransactional($log_test, "transactional_test");
 
