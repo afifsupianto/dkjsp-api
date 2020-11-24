@@ -306,12 +306,12 @@ class AktivitasApiController extends REST_Controller {
           }
         }
       }
-
       $cetak = $this->cetak($html, $tgl_aktivitas);
-      $pisah = explode('pdf',$cetak);
-      $file_pdf = substr($pisah[count($pisah)-1],2);
+      $str = "Content-Type: application/pdf;\r\n name=\"Laporan_Harian_$tgl_aktivitas.pdf\"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment;\r\n filename=\"Laporan_Harian_$tgl_aktivitas.pdf\"\r\n\r\n";
+      $pdf = str_replace($str, '', $cetak);
+
       $result = array(
-        'file_pdf'=>$file_pdf,
+        'file_pdf'=>$pdf,        
         'data_record'=>$list_aktivitas
       );
 
