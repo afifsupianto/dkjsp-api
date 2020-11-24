@@ -183,9 +183,9 @@ class KelasApiController extends REST_Controller {
                 $progress = array(
                     'id_user' => $data['id_user'],
                     'id_materi' => $id_materi->id_materi,
-                    'id_subbab_materi' => $data['id_subbab_materi'],
-                    'id_kelas' => $data['id_kelas'],
-                    'id_pelatihan' => $data['id_pelatihan']
+                    'id_subbab_materi' => $data['id_subbab_materi']
+                    // 'id_kelas' => $data['id_kelas'],
+                    // 'id_pelatihan' => $data['id_pelatihan']
                 );
 
                 $hasil_test = array(
@@ -196,8 +196,7 @@ class KelasApiController extends REST_Controller {
                 $data_exist = $this->GeneralApiModel->isDataTransactionalExist($progress, "transactional_progress_materi");
                 if($data_exist){
                     $this->response(array('status' => 200, 'message' => 'test sudah dilakukan!', 'data' => null));
-                }
-                else{
+                } else {
                     $insert = $this->GeneralApiModel->insertTransactional($progress, "transactional_progress_materi");
 
                     $log_test = array(
