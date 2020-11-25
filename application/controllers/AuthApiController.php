@@ -271,8 +271,7 @@ class AuthApiController extends REST_Controller
                     $result2 = $this->AuthApiModel->getViewByRole($view)->result();
                     if(!empty($result2)){
                         $this->response(array('status' => 200, 'message' => 'Login sukses!', 'data' => $result2[0]));
-                    }
-                    else{
+                    }else{
                         $this->response(array('status' => 200, 'message' => 'Data tidak tersedia', 'data' => null));
                     }
                 } else {
