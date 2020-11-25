@@ -52,7 +52,7 @@ class Aktivitas extends CI_Controller {
 			$html .= "<h1 align='center'> Aktivitas ".$aktivitas[0]->nama."</h1>";
 			foreach ($aktivitas as $a) {
 				if ($id_topik!=$a->id_topik) {
-					$html .= "<br/><br/><h2>$a->topik</h2>";
+					$html .= "<br/><hr><br/><h2>$a->topik</h2>";
 				}
 				if ($id_soal!=$a->id_soal) {
 					$html .= "<br/><h4>$a->soal</h4>";
