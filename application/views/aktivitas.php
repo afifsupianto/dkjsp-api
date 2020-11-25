@@ -53,14 +53,14 @@
         <label for="exampleInputPassword1">Soal</label>
         <input type="text" class="form-control" name="soal" placeholder="Soal">
       </div>
+      <div class="form-group float-right">
+        <button type="button" id="tambahJawaban" class="btn btn-secondary">Tambah Jawaban</button>
+      </div><br>
       <div class="" id="jawabans">
         <div class="form-group">
           <label for="exampleInputPassword1">Jawaban</label>
           <input type="text" class="form-control" name="jawaban[]" placeholder="Jawaban">
         </div>
-      </div>
-      <div class="form-group">
-        <button type="button" id="tambahJawaban" class="btn btn-secondary">Tambah Jawaban</button>
       </div>
       <button name="simpan" type="submit" class="btn btn-success col-md-12">Submit</button>
     </form>
