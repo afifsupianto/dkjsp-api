@@ -509,24 +509,26 @@ class KeluargaBinaanApiController extends REST_Controller{
     function gabungKeluargaBinaan_post(){
         $kode_referal = $this->input->post('kode_referal');
         if(!empty($kode_referal)){
-            $exist_check_referal = $this->GeneralApiModel->isDataTransactionalExist(array('kode_referal'=>$check_referal), 'transactional_kode_referal');
+            $kode = $this->GeneralApiModel->getWhereTransactional(array('kode_referal'=>$kode_referal), 'transactional_kode_referal')->result();
 
-            if(!$exist_check_referal){
-                $input_referal = array(
-                    'role' => 1,
-                    'kode_referal' => random_string('alnum', 6),
-                    'status_acc' => 0,
-                    'status_pembina' => 0,
-                    'id_user' => $data['id_user'],
-                    'id_pelatihan' => $data['id_pelatihan'],
-                    'id_kelas' => $data['id_kelas'],
-                    'tgl_join' => $this->dateToday
+            if(count($kode)>0){
+                $kode = $kode[0];
+                $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_pembina),'user_provinsi_kota')->result()[0];
+                $result = array(
+                    'id_pembina'=>$kode->id_pembina,
+                    'id_kelas'=>$kode->id_kelas,
+                    'id_pelatihan'=>$kode->id_pelatihan,
+                    'nama'=>$pembina->namalengkap,
+                    'institusi'=>($kode->role==0?$pembina->nama_institusi:'-'),
+                    'kabupaten'=>$pembina->nama_kota,
+                    'provinsi'=>$pembina->nama_provinsi,
+                    'waktu_tunggu'=>$kode->cdate,
+                    'tgl_join'=>$kode->tgl_join,
                 );
 
-                $insert_referal = $this->GeneralApiModel->insertTransactional($input_referal, 'transactional_kode_referal');
-                $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => true));
+                $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
             }else{
-                $this->response(array('status' => 200, 'message' => 'Kode referal tidak ditemukan!', 'data' => null));
+                $this->response(array('status' => 200, 'message' => 'Kode referal tidak ditemukan!', 'data' => false));
             }
         } else {
             $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan isi kode referal!', 'data' => null));
