@@ -100,8 +100,7 @@ class PesertaApiController extends REST_Controller
         ),
         'presensi_terakhir' => array(
           'waktu'=>($presensi?$presensi->cdate:null),
-          'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)
-          // 'is_sudah_presensi'=>$this->date_diff($presensi->cdate)
+          'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)          
         ),
         'laporan_harian_terakhir' => array(
           'id'=> ($aktivitas?$aktivitas->id_aktivitas:null),
