@@ -43,6 +43,40 @@ class GeneralApiModel extends CI_Model {
         return $status;
     }
 
+    function insertIdMaster($data, $tabel){
+        $db = $this->load->database('mhsc_masterdata', TRUE);
+        $db->trans_begin();
+
+        $db->insert($tabel, $data);
+
+        $status = $db->trans_status();
+
+        if ($status === FALSE){
+            $db->trans_rollback();
+        }else{
+            $insert_id = $db->insert_id();
+            $db->trans_commit();
+        }
+        return $insert_id;
+    }
+
+    function insertBatchMaster($data, $tabel){
+        $db = $this->load->database('mhsc_masterdata', TRUE);
+        $db->trans_begin();
+
+        $db->insert_batch($tabel, $data);
+
+        $status = $db->trans_status();
+
+        if ($status === FALSE){
+            $db->trans_rollback();
+        }
+        else{
+            $db->trans_commit();
+        }
+        return $status;
+    }
+
     function updateMaster($data, $id, $tabel){
         $db = $this->load->database('mhsc_masterdata', TRUE);
         $db->trans_begin();
