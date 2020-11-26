@@ -330,7 +330,7 @@ class AktivitasApiController extends REST_Controller {
     $waktu = (strtotime($now) - strtotime($date))/60/60+1;
 
     // return intval($hari);
-    $hari = (intval($waktu/24)+13);
+    $hari = 14-(intval($waktu/24));
     $jam = 24-intval($waktu%24);
     return array('hari'=>$jam==24?$hari+1:$hari, 'jam'=>$jam==24?0:$jam);
   }
