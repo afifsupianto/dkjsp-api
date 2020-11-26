@@ -111,4 +111,24 @@ class UserApiController extends REST_Controller {
         $this->response(array('status' => 200, 'message' => 'Data Belum Ada', 'data' => false));
       }
     }
+
+    function ubahProfil_post(){
+      $id_user = $this->input->post('id_user');
+      $namalengkap = $this->input->post('namalengkap');
+      $nik = $this->input->post('nik');
+      $email = $this->input->post('email');
+      $no_hp = $this->input->post('no_hp');
+      $alamat = $this->input->post('alamat');
+
+      if (!empty($id_user) && !empty($namalengkap) && !empty($email) && !empty($no_hp) && !empty($alamat)) {
+        $this->GeneralApiModel->updateTransactional(array('namalengkap'=>$namalengkap, ),array('id'=>$id_user),'transactional_user');
+        if (!empty($nik)) {
+          $this->GeneralApiModel->updateTransactional(array('nik_anggota'=>$nik),array('id'=>$id_user),'transactional_anggota_keluarga');
+        }
+        $this->GeneralApiModel->updateTransactional(array('alamat_lengkap'=>$alamat),array('id_user'=>$id_user),'transactional_alamat');
+        $this->response(array('status' => 200, 'message' => 'Data Berhasil Diubah', 'data' => true));
+      } else {
+        $this->response(array('status' => 200, 'message' => 'Data Tidak Lengkap', 'data' => false));
+      }
+    }
 }
