@@ -104,3 +104,4 @@ $route['api/user/list-kader'] = 'UserApiController/showSemuaUserKader';
 $route['api/user/list-keluarga-binaan'] = 'UserApiController/showSemuaUserKeluargaBinaan';
 $route['api/user/cek-data'] = 'UserApiController/cekData';
 $route['api/user/ubah-profil'] = 'UserApiController/ubahProfil';
+$route['api/user/ganti-password'] = 'UserApiController/gantiPassword';
