@@ -28,6 +28,7 @@ class PesertaApiController extends REST_Controller
     );
     $id_user = $this->input->post('id_user');
     $id_kelas = $this->input->post('id_kelas');
+    // $id_pelatihan = $this->input->post('id_pelatihan');
 
     if(!empty($id_kelas) && !empty($id_user)){
       $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
@@ -100,7 +101,7 @@ class PesertaApiController extends REST_Controller
         ),
         'presensi_terakhir' => array(
           'waktu'=>($presensi?$presensi->cdate:null),
-          'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)          
+          'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)
         ),
         'laporan_harian_terakhir' => array(
           'id'=> ($aktivitas?$aktivitas->id_aktivitas:null),
