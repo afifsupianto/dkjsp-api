@@ -43,13 +43,14 @@ class Aktivitas extends CI_Controller {
 
 	function lihat($id_aktivitas=null){
 		$data['aktivitas'] = $this->GeneralApiModel->getAllMaster('masterdata_aktivitas')->result();
+		$pilih = $this->GeneralApiModel->getWhereMaster(array('id'=>$id_aktivitas),'masterdata_aktivitas')->row();
 		$html = '';
 		if (!empty($id_aktivitas)) {
 			$aktivitas = $this->GeneralApiModel->getWhereMaster(array('id_aktivitas'=>$id_aktivitas),'detail_soal_aktivitas')->result();
 			$id_topik = 0;
 			$id_soal = 0;
 			$id_jawaban = 0;
-			$html .= "<h1 align='center'> Aktivitas ".$aktivitas[0]->nama."</h1>";
+			$html .= "<h1 align='center'>".($aktivitas?"Aktivitas ".$aktivitas[0]->nama:"Data ".$pilih->nama." Kosong")."</h1>";
 			foreach ($aktivitas as $a) {
 				if ($id_topik!=$a->id_topik) {
 					$html .= "<br/><hr><br/><h2>$a->topik</h2>";
