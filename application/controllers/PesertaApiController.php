@@ -132,7 +132,6 @@ class PesertaApiController extends REST_Controller
     $id_user = $this->input->post('id_user');
     $id_pelatihan = $this->input->post('id_pelatihan');
 
-
     if(!empty($id_kelas['id_kelas']) && !empty($id_kelas['id_user']) && !empty($id_kelas['id_pelatihan'])){
       $data = array();
       $result = $this->GeneralApiModel->getWhereTransactional(array("id_kelas" => $this->input->post('id_kelas')), "kelas_pelatihan")->row();
@@ -143,7 +142,7 @@ class PesertaApiController extends REST_Controller
 
         $judul = 'Belum Mengerjakan Materi';
         foreach ($histori_test as $h) {
-          $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
+          $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0];
           $tipe = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_subbab_materi),'masterdata_subbab_materi')->result()[0]->judul;
           if (strtolower($tipe)=='pretest') {
             $pre_soal=$h->jumlah_soal;
@@ -152,17 +151,15 @@ class PesertaApiController extends REST_Controller
             $post_soal=$h->jumlah_soal;
             $post_benar=$h->jumlah_benar;
           }
-          // $tot_nilai+=$h->jumlah_benar;
-          array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>number_format(($h->jumlah_benar/$h->jumlah_soal)*100, 2), 'tgl_buat'=>$h->cdate));
+          array_push($list_test, array('id'=>$judul->id, 'judul_materi'=>$judul->judul, 'skor_akhir'=>number_format(($h->jumlah_benar/$h->jumlah_soal)*100, 2), 'tgl_buat'=>$h->cdate));
         }
 
         $pre = $pre_benar==0?0:number_format(($pre_benar/$pre_soal)*100,2);
         $post = $post_benar==0?0:number_format(($post_benar/$post_soal)*100,2);
         $data['jumlah_pretest'] = $pre;
         $data['jumlah_posttest'] = $post;
-        // $data['jumlah_benar'] = number_format(($pre+$post)/2,2);
         $data['deskripsi_pelatihan'] = $result->deskripsi_pelatihan;
-        $data['judul_materi_terakhir'] = $judul;
+        $data['judul_materi_terakhir'] = ($judul->judul?$judul->judul:$judul);
         $data['jumlah_anggota_kelas'] = $result->jumlah_peserta; //buat view counting di kode referal where role = 0
         $data['nama_kelas'] = $result->nama_kelas;
         $data['nilai_rata_seluruh_test'] = number_format(($pre+$post)/2,2);
@@ -547,7 +544,7 @@ class PesertaApiController extends REST_Controller
             $tot_nilai = 0; $pre_soal = 0; $pre_benar = 0; $post_soal = 0; $post_benar = 0;
 
             foreach ($histori_test as $h) {
-              $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0]->judul;
+              $judul = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_materi),'masterdata_materi')->result()[0];
               $tipe = $this->GeneralApiModel->getWhereMaster(array('id'=>$h->id_subbab_materi),'masterdata_subbab_materi')->result()[0]->judul;
               if (strtolower($tipe)=='pretest') {
                 $pre_soal=$h->jumlah_soal;
@@ -559,7 +556,7 @@ class PesertaApiController extends REST_Controller
                 $tgl_post = $h->cdate;
               }
               // $tot_nilai+=$h->jumlah_benar;
-              array_push($list_test, array('id'=>$h->id, 'judul_materi'=>$judul, 'skor_akhir'=>number_format(($h->jumlah_benar/$h->jumlah_soal)*100, 2), 'tgl_buat'=>$h->cdate));
+              array_push($list_test, array('id'=>$judul->id, 'judul_materi'=>$judul->judul, 'skor_akhir'=>number_format(($h->jumlah_benar/$h->jumlah_soal)*100, 2), 'tgl_buat'=>$h->cdate));
             }
 
             $pre = $pre_benar==0?0:number_format(($pre_benar/$pre_soal)*100,2);

@@ -18,6 +18,10 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function getDataKeluargaBinaan_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $where = array(
       'nomor_kk' => $this->input->post('nomor_kk')
     );
@@ -31,6 +35,10 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function detailKeluarga_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $data = array(
       'no_kk' => $this->input->post('no_kk')
     );
@@ -123,6 +131,10 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function detailKader_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $data = array(
       'id_user' => $this->input->post('id_user')
     );
@@ -225,6 +237,10 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function gabungKader_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $data = array(
       'id_user' => $this->input->post('id_user'),
       'id_pelatihan' => $this->input->post('id_pelatihan'),
@@ -262,6 +278,10 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function updatekaderByPeserta_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $data = array(
       'status_acc' => $this->input->post('status_acc'), //0 = ..., 1 = ...
       'id_pembina' => $this->input->post('id_pembina')
@@ -289,18 +309,18 @@ class KeluargaBinaanApiController extends REST_Controller{
         $this->response(array('status' => 200, 'message' => 'Id Pembina tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
       }
 
-    }else if(($data['status_acc'] == 0) && $data['status_acc'] != ''){
+    } else if(($data['status_acc'] == 0) && $data['status_acc'] != ''){
       $update_binaan = array(
         'id_pembina' => 0,
         'status_acc' => 0
       );
 
-      $result = $this->GeneralApiModel->updateTransactional($update_binaan, $where, 'transactional_kode_referal');
+      $result = $this->GeneralApiModel->deleteTransactional($where, 'transactional_kode_referal');
       if($result){
-        $this->response(array('status' => 200, 'message' => 'Kader Berhasil ditolak!', 'data' => $result));
+        $this->response(array('status' => 200, 'message' => 'Kader Berhasil ditolak, data dihapus!', 'data' => $result));
       }
       else{
-        $this->response(array('status' => 200, 'message' => 'ACC kader Dilakukan!', 'data' => null));
+        $this->response(array('status' => 200, 'message' => 'Gagal tolak kader!', 'data' => null));
       }
     }
     else{
@@ -309,6 +329,10 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function updateKeluargaBinaanByPeserta_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $data = array(
       'status_acc' => $this->input->post('status_acc'), //0 = ..., 1 = ...
       'id_pembina' => $this->input->post('id_pembina')
@@ -329,8 +353,7 @@ class KeluargaBinaanApiController extends REST_Controller{
         else{
           $this->response(array('status' => 200, 'message' => 'ACC Keluarga Binaan Gagal Dilakukan!', 'data' => null));
         }
-      }
-      else{
+      } else{
         $this->response(array('status' => 200, 'message' => 'Id Pembina tidak ditemukan! Update Gagal Dilakukan!', 'data' => null));
       }
 
@@ -339,11 +362,10 @@ class KeluargaBinaanApiController extends REST_Controller{
         'id_pembina' => 0,
       );
 
-      $result = $this->GeneralApiModel->updateTransactional($update_binaan, $nomor_kk, 'transactional_binaan');
+      $result = $this->GeneralApiModel->deleteTransactional($nomor_kk, 'transactional_binaan');
       if($result){
         $this->response(array('status' => 200, 'message' => 'Keluarga Binaan oleh Relawan Berhasil ditolak!', 'data' => $result));
-      }
-      else{
+      }else{
         $this->response(array('status' => 200, 'message' => 'ACC Keluarga Binaan Gagal Dilakukan!', 'data' => null));
       }
     }
@@ -353,27 +375,37 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 
   function dashboard_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $id_user = $this->input->post('id_user');
     if(!empty($id_user)){
-      $user = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result()[0];
+      $user = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result();
+      $user = ($user?$user[0]:null);
 
       $result = array(
-        'id_kelas'=>$user->id_kelas,
-        'id_pelatihan'=>$user->id_pelatihan,
-        'nama_pelatihan'=>$user->nama,
-        'deskripsi_pelatihan'=>$user->deskripsi,
-        'nama_pembina'=>$user->nama_pembina,
-        'periode_kelas'=>array('tgl_buka'=>$user->tgl_buka, 'tgl_selesai'=>$user->tgl_selesai),
-        'status_kelas'=>$user->status_kelas,
-        'status_role'=>$user->status_keluarga,
+        'id_kelas'=>($user?$user->id_kelas:null),
+        'id_pelatihan'=>($user?$user->id_pelatihan:null),
+        'id_pembina'=>($user?$user->id_pembina:null),
+        'nama_pelatihan'=>($user?$user->nama:null),
+        'deskripsi_pelatihan'=>($user?$user->deskripsi:null),
+        'nama_pembina'=>($user?$user->nama_pembina:null),
+        'periode_kelas'=>array('tgl_buka'=>($user?$user->tgl_buka:null), 'tgl_selesai'=>($user?$user->tgl_selesai:null)),
+        'status_kelas'=>($user?$user->status_kelas:null),
+        'status_role'=>($user?$user->status_keluarga:null),
       );
-      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
+      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $user));
     } else {
       $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
     }
   }
 
   function home_post(){
+    $time_expired=60*60*24*3;
+    $time_aweek=$time_expired*2;
+    header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
     $id_user = $this->input->post('id_user');
     $id_kelas = $this->input->post('id_kelas');
     $id_pelatihan = $this->input->post('id_pelatihan');
@@ -462,100 +494,108 @@ class KeluargaBinaanApiController extends REST_Controller{
   }
 }
 
-  function homeKader_post(){
-    $id_user = $this->input->post('id_user');
-    $id_kelas = $this->input->post('id_kelas');
-    $id_pelatihan = $this->input->post('id_pelatihan');
-    if(!empty($id_user)){
-      $detail = $this->GeneralApiModel->getWhereTransactional(array('id_user'=>$id_user),'dashboard_keluargabinaan')->result();
-      if (count($detail)>0) {
-        $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+function homeKader_post(){
+  $time_expired=60*60*24*3;
+  $time_aweek=$time_expired*2;
+  header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
+  $id_user = $this->input->post('id_user');
+  $id_kelas = $this->input->post('id_kelas');
+  $id_pelatihan = $this->input->post('id_pelatihan');
+  if(!empty($id_user)){
+    $detail = $this->GeneralApiModel->getWhereTransactional(array('id_user'=>$id_user),'dashboard_keluargabinaan')->result();
+    if (count($detail)>0) {
+      $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_hasil_skrining")->result();
+      $kondisi = ($kondisi?$kondisi[0]:null);
+      $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
+      $presensi = ($presensi?$presensi[0]:null);
+
+      $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
+      $id_pelatihan = $kelas->id_pelatihan;
+      $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
+      $aktivitas = ($aktivitas?$aktivitas[0]:null);
+
+      $detail = $detail[0];
+      $id_pembina = $detail->id_pembina;
+      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_pembina),'user_provinsi_kota')->result()[0];
+
+      $kk = $detail->nomor_kk;
+
+      $anggota = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk'=>$kk),'user_anggotakeluarga_detail')->result();
+
+      $list_anggota = array();
+
+      $status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
+      foreach ($anggota as $a) {
+        $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$a->id), "cdate", "DESC", "transactional_hasil_skrining")->result();
         $kondisi = ($kondisi?$kondisi[0]:null);
-        $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user), "cdate", "DESC", "transactional_presensi")->result();
+
+        $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$a->id), "cdate", "DESC", "transactional_presensi")->result();
         $presensi = ($presensi?$presensi[0]:null);
 
-        $kelas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id"=>$id_kelas), "cdate", "DESC", "transactional_kelas")->result()[0];
-        $id_pelatihan = $kelas->id_pelatihan;
-        $aktivitas = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$id_user, "id_kelas"=>$id_kelas,"id_pelatihan"=>$id_pelatihan), "cdate", "DESC", "transactional_hasil_aktivitas")->result();
-        $aktivitas = ($aktivitas?$aktivitas[0]:null);
-
-        $detail = $detail[0];
-        $id_pembina = $detail->id_pembina;
-        $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_pembina),'user_provinsi_kota')->result()[0];
-
-        $kk = $detail->nomor_kk;
-
-        $anggota = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk'=>$kk),'user_anggotakeluarga_detail')->result();
-
-        $list_anggota = array();
-
-        $status_keluarga = array("Kepala Keluarga", "Istri", "Anak");
-        foreach ($anggota as $a) {
-          $kondisi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$a->id), "cdate", "DESC", "transactional_hasil_skrining")->result();
-          $kondisi = ($kondisi?$kondisi[0]:null);
-
-          $presensi = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array("id_user"=>$a->id), "cdate", "DESC", "transactional_presensi")->result();
-          $presensi = ($presensi?$presensi[0]:null);
-
-          array_push($list_anggota,
-          array(
-            'nama_anggota'=>$a->namalengkap,
-            'role_anggota'=>$status_keluarga[$a->status_keluarga],
-            'kondisi_fisik'=>($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
-            'terakhir_presensi'=>($presensi?$presensi->cdate:null)
-          )
-        );
-      }
-
-      $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_kelas"=>$id_kelas), "cdate", "ASC", " transactional_binaan")->result();
-      $list_binaan = array();
-      foreach ($binaan as $b) {
-        $no_kk = $b->nomor_kk;
-        $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk), 'user_anggotakeluarga_detail')->result()[0];
-        array_push($list_binaan, array("nomor_kk"=>$no_kk, "nama"=>$daftar->namalengkap));
-      }
-
-      $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_kelas"=>$id_kelas, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
-      $list_kader = array();
-      foreach ($kader as $b) {
-        $id_user = $b->id_user;
-        $daftar = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_user), 'transactional_user')->result()[0];
-        array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
-      }
-
-      $result = array(
-        'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
-        'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
-        'terakhir_presensi' => ($presensi?$presensi->cdate:null),
-        'terakhir_isi_laporan' => ($aktivitas?$aktivitas->cdate:null),
-        'id_grading'=>($kondisi?$kondisi->kondisi_fisik:null),
-        'skrining_terakhir'=> array(
-          'id'=>($kondisi?$kondisi->id_skrining:null),
-          'is_sudah_skrining'=>($kondisi?($this->date_diff($kondisi->cdate)<=14?true:false):null)
-        ),
-        'presensi_terakhir' => array(
-          'waktu'=>($presensi?$presensi->cdate:null),
-          'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)
-        ),
-        'laporan_harian_terakhir' => array(
-          'id'=> ($aktivitas?$aktivitas->id_aktivitas:null),
-          'waktu'=>($aktivitas?$aktivitas->cdate:null),
-          'is_sudah_isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null)
-        ),
-        'anggota_keluarga' => $list_anggota,
-        'list_keluargabinaan' => $list_binaan,
-        'list_kader' => $list_kader
+        array_push($list_anggota,
+        array(
+          'nama_anggota'=>$a->namalengkap,
+          'role_anggota'=>$status_keluarga[$a->status_keluarga],
+          'kondisi_fisik'=>($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+          'terakhir_presensi'=>($presensi?$presensi->cdate:null)
+        )
       );
-      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
-    } else {
-      $this->response(array('status' => 200, 'message' => 'User tidak terdaftar sebagai keluarga binaan', 'data' => null));
     }
+
+    $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_kelas"=>$id_kelas), "cdate", "ASC", " transactional_binaan")->result();
+    $list_binaan = array();
+    foreach ($binaan as $b) {
+      $no_kk = $b->nomor_kk;
+      $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk), 'user_anggotakeluarga_detail')->result()[0];
+      array_push($list_binaan, array("nomor_kk"=>$no_kk, "nama"=>$daftar->namalengkap));
+    }
+
+    $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_kelas"=>$id_kelas, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
+    $list_kader = array();
+    foreach ($kader as $b) {
+      $id_user = $b->id_user;
+      $daftar = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_user), 'transactional_user')->result()[0];
+      array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
+    }
+
+    $result = array(
+      'kondisi_fisik' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_fisik),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+      'kondisi_mental' => ($kondisi?$return_fisik = $this->GeneralApiModel->getWhereMaster(array('id' => $kondisi->kondisi_mental),'masterdata_grading_status_kesehatan')->result()[0]->nama:null),
+      'terakhir_presensi' => ($presensi?$presensi->cdate:null),
+      'terakhir_isi_laporan' => ($aktivitas?$aktivitas->cdate:null),
+      'id_grading'=>($kondisi?$kondisi->kondisi_fisik:null),
+      'skrining_terakhir'=> array(
+        'id'=>($kondisi?$kondisi->id_skrining:null),
+        'is_sudah_skrining'=>($kondisi?($this->date_diff($kondisi->cdate)<=14?true:false):null)
+      ),
+      'presensi_terakhir' => array(
+        'waktu'=>($presensi?$presensi->cdate:null),
+        'is_sudah_presensi'=>($presensi?($this->date_diff($presensi->cdate)==0?true:false):null)
+      ),
+      'laporan_harian_terakhir' => array(
+        'id'=> ($aktivitas?$aktivitas->id_aktivitas:null),
+        'waktu'=>($aktivitas?$aktivitas->cdate:null),
+        'is_sudah_isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null)
+      ),
+      'anggota_keluarga' => $list_anggota,
+      'list_keluargabinaan' => $list_binaan,
+      'list_kader' => $list_kader
+    );
+    $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
   } else {
-    $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
+    $this->response(array('status' => 200, 'message' => 'User tidak terdaftar sebagai keluarga binaan', 'data' => null));
   }
+} else {
+  $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
+}
 }
 
 function menu_post(){
+  $time_expired=60*60*24*3;
+  $time_aweek=$time_expired*2;
+  header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
   $id_user = $this->input->post('id_user');
   $id_kelas = $this->input->post('id_kelas');
   $id_pelatihan = $this->input->post('id_pelatihan');
@@ -599,35 +639,55 @@ function menu_post(){
 }
 
 function cariRelawan_post(){
+  $time_expired=60*60*24*3;
+  $time_aweek=$time_expired*2;
+  header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
   $kode_referal = $this->input->post('kode_referal');
-  if(!empty($kode_referal)){
+  $id_user = $this->input->post('id_user');
+  if(!empty($kode_referal) && !empty($id_user)){
     $kode = $this->GeneralApiModel->getWhereTransactional(array('kode_referal'=>$kode_referal), 'transactional_kode_referal')->result();
 
     if(count($kode)>0){
       $kode = $kode[0];
-      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_pembina),'user_provinsi_kota')->result()[0];
-      $result = array(
-        'id_pembina'=>$kode->id_pembina,
-        'id_kelas'=>$kode->id_kelas,
-        'id_pelatihan'=>$kode->id_pelatihan,
-        'nama'=>$pembina->namalengkap,
-        'institusi'=>($kode->role==0?$pembina->nama_institusi:'-'),
-        'kabupaten'=>$pembina->nama_kota,
-        'provinsi'=>$pembina->nama_provinsi,
-        'waktu_tunggu'=>$kode->cdate,
-        'tgl_join'=>$kode->tgl_join,
-      );
+      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_pembina),'user_provinsi_kota')->result();
+      $pembina = $pembina?$pembina[0]:null;
+      $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
 
-      $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
-    }else{
+      if ($id_user==$kode->id_pembina) {
+        $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
+      } else {
+        $result = array(
+          'id_pembina'=>$kode->id_pembina,
+          'id_kelas'=>$kode->id_kelas,
+          'id_pelatihan'=>$kode->id_pelatihan,
+          'nama_pelatihan'=>$this->GeneralApiModel->getWhereMaster(array('id'=>$kode->id_pelatihan), 'masterdata_pelatihan')->row()->nama,
+          'nama'=>$pembina->namalengkap,
+          'institusi'=>($kode->role==0?($pembina?$pembina->nama_institusi:null):'-'),
+          'kabupaten'=>($pembina?$pembina->nama_kota:null),
+          'provinsi'=>($pembina?$pembina->nama_provinsi:null),
+          'waktu_tunggu'=>$kode->cdate,
+          'tgl_join'=>$kode->tgl_join,
+          'status_kelas'=>$status_kelas
+        );
+        $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
+      }
+    } else {
       $this->response(array('status' => 200, 'message' => 'Kode referal tidak ditemukan!', 'data' => false));
     }
-  } else {
+  }else{
     $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan isi kode referal!', 'data' => null));
   }
 }
+//  else {
+// }
+// }
 
 function gabungKeluargaBinaan_post(){
+  $time_expired=60*60*24*3;
+  $time_aweek=$time_expired*2;
+  header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
   $no_kk = $this->input->post('no_kk');
   $id_pembina = $this->input->post('id_pembina');
   $id_pelatihan = $this->input->post('id_pelatihan');
@@ -650,6 +710,10 @@ function gabungKeluargaBinaan_post(){
 }
 
 function keluarKeluargaBinaan_post(){
+  $time_expired=60*60*24*3;
+  $time_aweek=$time_expired*2;
+  header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
   $no_kk = $this->input->post('no_kk');
   $id_pembina = $this->input->post('id_pembina');
   $id_pelatihan = $this->input->post('id_pelatihan');
