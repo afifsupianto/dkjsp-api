@@ -382,20 +382,24 @@ class KeluargaBinaanApiController extends REST_Controller{
     $id_user = $this->input->post('id_user');
     if(!empty($id_user)){
       $user = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result();
-      $user = ($user?$user[0]:null);
 
-      $result = array(
-        'id_kelas'=>($user?$user->id_kelas:null),
-        'id_pelatihan'=>($user?$user->id_pelatihan:null),
-        'id_pembina'=>($user?$user->id_pembina:null),
-        'nama_pelatihan'=>($user?$user->nama:null),
-        'deskripsi_pelatihan'=>($user?$user->deskripsi:null),
-        'nama_pembina'=>($user?$user->nama_pembina:null),
-        'periode_kelas'=>array('tgl_buka'=>($user?$user->tgl_buka:null), 'tgl_selesai'=>($user?$user->tgl_selesai:null)),
-        'status_kelas'=>($user?$user->status_kelas:null),
-        'status_role'=>($user?$user->status_keluarga:null),
-      );
-      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $user));
+      $result = array();
+      foreach ($user as $u) {
+        $push = array(
+          'id_kelas'=>($u->id_kelas),
+          'id_pelatihan'=>($u->id_pelatihan),
+          'id_pembina'=>($u->id_pembina),
+          'nama_pelatihan'=>($u->nama),
+          'deskripsi_pelatihan'=>($u->deskripsi),
+          'nama_pembina'=>($u->nama_pembina),
+          'periode_kelas'=>array('tgl_buka'=>($u->tgl_buka), 'tgl_selesai'=>($u->tgl_selesai)),
+          'status_kelas'=>($u->status_kelas),
+          'status_role'=>($u->status_keluarga),
+        );
+        array_push($result, $push);
+      }
+
+      $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
     } else {
       $this->response(array('status' => 200, 'message' => 'Data tidak ditemukan, id user / id pelatihan tidak tersedia!', 'data' => null));
     }
@@ -650,15 +654,15 @@ function cariRelawan_post(){
 
     if(count($kode)>0){
       $kode = $kode[0];
-      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_pembina),'user_provinsi_kota')->result();
+      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_user),'transactional_alamat')->result();
       $pembina = $pembina?$pembina[0]:null;
       $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
 
-      if ($id_user==$kode->id_pembina) {
+      if ($id_user==$kode->id_user) {
         $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
       } else {
         $result = array(
-          'id_pembina'=>$kode->id_pembina,
+          'id_pembina'=>$kode->id_user,
           'id_kelas'=>$kode->id_kelas,
           'id_pelatihan'=>$kode->id_pelatihan,
           'nama_pelatihan'=>$this->GeneralApiModel->getWhereMaster(array('id'=>$kode->id_pelatihan), 'masterdata_pelatihan')->row()->nama,
