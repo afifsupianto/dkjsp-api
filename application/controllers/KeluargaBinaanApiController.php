@@ -395,6 +395,7 @@ class KeluargaBinaanApiController extends REST_Controller{
           'periode_kelas'=>array('tgl_buka'=>($u->tgl_buka), 'tgl_selesai'=>($u->tgl_selesai)),
           'status_kelas'=>($u->status_kelas),
           'status_role'=>($u->status_keluarga),
+          'status_acc'=>($u->status_acc),
         );
         array_push($result, $push);
       }
