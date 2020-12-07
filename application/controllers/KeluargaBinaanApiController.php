@@ -736,6 +736,43 @@ function keluarKeluargaBinaan_post(){
   }
 }
 
+function menuRelawanKader_post(){
+  $time_expired=60*60*24*3;
+  $time_aweek=$time_expired*2;
+  header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
+  $id_user = $this->input->post('id_user');
+  $id_kelas = $this->input->post('id_kelas');
+  $id_pelatihan = $this->input->post('id_pelatihan');
+
+  if(!empty($id_kelas) && !empty($id_user) && !empty($id_pelatihan)){
+    $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan,"id_kelas"=>$id_kelas), "cdate", "ASC", " transactional_binaan")->result();
+    $list_binaan = array();
+    foreach ($binaan as $b) {
+      $no_kk = $b->nomor_kk;
+      $daftar = $this->GeneralApiModel->getWhereTransactional(array("nomor_kk"=>$no_kk), 'user_anggotakeluarga_detail')->result()[0];
+      array_push($list_binaan, array("nomor_kk"=>$no_kk, "nama"=>$daftar->namalengkap));
+    }
+
+    $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, 'id_pelatihan'=>$id_pelatihan, "id_kelas"=>$id_kelas, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
+    $list_kader = array();
+    foreach ($kader as $b) {
+      $id_user = $b->id_user;
+      $daftar = $this->GeneralApiModel->getWhereTransactional(array("id"=>$id_user), 'transactional_user')->result()[0];
+      array_push($list_kader, array("id_user"=>$id_user, "nama"=>$daftar->namalengkap));
+    }
+
+    $result = array(
+      'jml_kader'=>count($list_kader),
+      'jml_keluarga_binaan'=>count($list_binaan),
+      'list_kader'=>$list_kader,
+      'list_keluargabinaan'=>$list_binaan,
+    );
+    $this->response(array('status' => 200, 'message' => 'Berhasil mendapatkan data!', 'data' => $result));
+  }else{
+    $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => false));
+  }
+}
 function date_diff($date){
   $now = new DateTime();
   $now = date_format($now, 'Y-m-d h:m:s');
