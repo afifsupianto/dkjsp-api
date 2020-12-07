@@ -95,6 +95,8 @@ $route['api/master/input-materi'] = 'MasterApiController/masukkanMasterMateri';
 $route['api/master/edit-materi'] = 'MasterApiController/editMasterMateri';
 $route['api/master/hapus-materi'] = 'MasterApiController/hapusMasterMateri';
 $route['api/master/list-materi'] = 'MasterApiController/showSemuaMasterMateri';
+$route['api/master/show-faq'] = 'MasterApiController/showFAQ';
+$route['api/master/detail-faq'] = 'MasterApiController/detailFAQ';
 
 $route['api/user/list-admin'] = 'UserApiController/showSemuaUserAdmin';
 $route['api/user/list-operator'] = 'UserApiController/showSemuaUserOperator';

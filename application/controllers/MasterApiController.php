@@ -9,7 +9,7 @@ class MasterApiController extends REST_Controller {
 
     function __construct($config = 'rest') {
         parent::__construct($config);
-        date_default_timezone_set("Asia/Jakarta"); 
+        date_default_timezone_set("Asia/Jakarta");
         $this->dateToday = date("Y-m-d H:i:s");
         $this->timeToday = date("h:i:s");
         $this->load->model("GeneralApiModel");
@@ -29,6 +29,53 @@ class MasterApiController extends REST_Controller {
         }
     }
 
+    function showFAQ_get(){
+        $time_expired=60*60*24*3;
+        $time_aweek=$time_expired*2;
+        header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
+        $faq = $this->GeneralApiModel->getAllMaster("masterdata_kategori_faq")->result();
+        $result = array();
+        $list_pertanyaan = array();
+        if(!empty($faq)){
+            foreach ($faq as $f) {
+              $list_pertanyaan = array();
+              $pertanyaan = $this->GeneralApiModel->getWhereMaster(array('id_kategori'=>$f->id), 'masterdata_faq')->result();
+              foreach ($pertanyaan as $p) {
+                array_push($list_pertanyaan, array('id'=>$p->id, 'pertanyaan'=>$pertanyaan));
+              }
+              array_push($result, array('kategori'=>$f->kategori, 'list_pertanyaan'=>$list_pertanyaan));
+            }
+            $this->response(array('status' => 200, 'message' => 'Data Berhasil Ditemukan!', 'data' => $result));
+        } else {
+            $this->response(array('status' => 200, 'message' => 'Data FAQ Kosong!', 'data' => null));
+        }
+    }
+
+    function detailFAQ_post(){
+        $time_expired=60*60*24*3;
+        $time_aweek=$time_expired*2;
+        header("Cache-Control: public,max-age=$time_expired,s-maxage=$time_aweek");
+
+        $id_pertanyaan = $this->input->post('id_pertanyaan');
+
+        if(!empty($id_pertanyaan)){
+            $pertanyaan = $this->GeneralApiModel->getWhereMaster(array('id'=>$id_pertanyaan), 'detail_faq')->row();
+            $lainnya = $this->GeneralApiModel->getWhereMaster(array('id_kategori'=>$pertanyaan->id_kategori), 'detail_faq')->result();
+
+            $random = count($lainnya)-1;
+            $result = array(
+              'kategori' => $pertanyaan->kategori,
+              'pertanyaan' => $pertanyaan->pertanyaan,
+              'jawaban' => $pertanyaan->jawaban,
+              'pertanyaan_lainnya' => array($lainnya[rand(0,$random)],$lainnya[rand(0,$random)]),
+            );
+            $this->response(array('status' => 200, 'message' => 'Data Berhasil Ditemukan!', 'data' => $result));
+        } else {
+            $this->response(array('status' => 200, 'message' => 'ID Pertanyaan Kosong!', 'data' => null));
+        }
+    }
+
     function showDaftarKota_get(){
         $time_expired=60*60*24*3;
         $time_aweek=$time_expired*2;
@@ -44,7 +91,7 @@ class MasterApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Data Kota Tidak Ditemukan!', 'data' => null));
         }
     }
-    
+
     function showDaftarKecamatan_get(){
         $time_expired=60*60*24*3;
         $time_aweek=$time_expired*2;
@@ -60,7 +107,7 @@ class MasterApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Data Kota Tidak Ditemukan!', 'data' => null));
         }
     }
-    
+
     function showDaftarDesa_get(){
         $time_expired=60*60*24*3;
         $time_aweek=$time_expired*2;
@@ -76,7 +123,7 @@ class MasterApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Data Kota Tidak Ditemukan!', 'data' => null));
         }
     }
-    
+
     function showDaftarProvinsiInstitusi_get(){
         $time_expired=60*60*24*3;
         $time_aweek=$time_expired*2;
@@ -114,7 +161,7 @@ class MasterApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Input pelatihan sukses!', 'data' => $insert));
         }
     }
-    
+
     //Note: untuk return datatable tidak boleh null! karena akan error pada JQUERY nya!. return querynya saja
     function showSemuaMasterPelatihan_get(){
         $result = $this->GeneralApiModel->getAllMaster("masterdata_pelatihan")->result();
@@ -189,7 +236,7 @@ class MasterApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Input  materi Sukses!', 'data' => $insert));
         }
     }
-    
+
     //Note: untuk return datatable tidak boleh null! karena akan error pada JQUERY nya!. return querynya saja
     function showSemuaMasterMateri_get(){
         $result = $this->GeneralApiModel->getAllMaster("masterdata_materi")->result();
