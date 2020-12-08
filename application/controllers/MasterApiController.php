@@ -63,12 +63,17 @@ class MasterApiController extends REST_Controller {
             $pertanyaan = $this->GeneralApiModel->getWhereMaster(array('id'=>$id_pertanyaan), 'detail_faq')->row();
             $lainnya = $this->GeneralApiModel->getWhereMaster(array('id_kategori'=>$pertanyaan->id_kategori), 'detail_faq')->result();
 
-            $random = count($lainnya)-1;
+            $satu = rand(0,count($lainnya)-1);
+            $dua = rand(0,count($lainnya)-1);
+            do {
+              $dua = rand(0,count($lainnya)-1);
+            } while ($satu==$dua);
+
             $result = array(
               'kategori' => $pertanyaan->kategori,
               'pertanyaan' => $pertanyaan->pertanyaan,
               'jawaban' => $pertanyaan->jawaban,
-              'pertanyaan_lainnya' => array($lainnya[rand(0,$random)],$lainnya[rand(0,$random)]),
+              'pertanyaan_lainnya' => $pertanyaan?array($lainnya[$satu],$lainnya[$dua]):null,
             );
             $this->response(array('status' => 200, 'message' => 'Data Berhasil Ditemukan!', 'data' => $result));
         } else {
