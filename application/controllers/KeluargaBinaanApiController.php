@@ -656,13 +656,13 @@ function cariRelawan_post(){
 
     if(count($kode)>0){
       $kode = $kode[0];
-      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_user),'transactional_alamat')->result();
+      $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_user),'detail_alamat')->result();
       $pembina = $pembina?$pembina[0]:null;
       $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
 
-      if ($id_user==$kode->id_user) {
-        $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
-      } else {
+      // if ($id_user==$kode->id_user) {
+      //   $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
+      // } else {
         $result = array(
           'id_pembina'=>$kode->id_user,
           'id_kelas'=>$kode->id_kelas,
@@ -677,7 +677,7 @@ function cariRelawan_post(){
           'status_kelas'=>$status_kelas
         );
         $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
-      }
+      // }
     } else {
       $this->response(array('status' => 200, 'message' => 'Kode referal tidak ditemukan!', 'data' => false));
     }
