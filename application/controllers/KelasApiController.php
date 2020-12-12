@@ -15,7 +15,7 @@ class KelasApiController extends REST_Controller {
         $this->load->model("GeneralApiModel");
     }
 
-    function gabungKelas_post(){
+    function gabungKelas_post(){        
         $random = random_string('alnum', 6);
         $data = array(
             'kode_referal' => $random,

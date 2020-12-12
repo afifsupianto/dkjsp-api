@@ -382,6 +382,7 @@ class KeluargaBinaanApiController extends REST_Controller{
     $id_user = $this->input->post('id_user');
     if(!empty($id_user)){
       $user = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result();
+      $role = $this->GeneralApiModel->getWhereTransactional(array('id_user'=>$id_user),'transactional_kode_referal')->row();
 
       $result = array();
       foreach ($user as $u) {
@@ -394,7 +395,7 @@ class KeluargaBinaanApiController extends REST_Controller{
           'nama_pembina'=>($u->nama_pembina),
           'periode_kelas'=>array('tgl_buka'=>($u->tgl_buka), 'tgl_selesai'=>($u->tgl_selesai)),
           'status_kelas'=>($u->status_kelas),
-          'status_role'=>($u->status_keluarga),
+          'status_role'=>($role->role),
           'status_acc'=>($u->status_acc),
           'cdate'=>($u->cdate),
         );
@@ -660,9 +661,9 @@ function cariRelawan_post(){
       $pembina = $pembina?$pembina[0]:null;
       $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
 
-      // if ($id_user==$kode->id_user) {
-      //   $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
-      // } else {
+      if ($id_user==$kode->id_user) {
+        $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
+      } else {
         $result = array(
           'id_pembina'=>$kode->id_user,
           'id_kelas'=>$kode->id_kelas,
@@ -677,7 +678,7 @@ function cariRelawan_post(){
           'status_kelas'=>$status_kelas
         );
         $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
-      // }
+      }
     } else {
       $this->response(array('status' => 200, 'message' => 'Kode referal tidak ditemukan!', 'data' => false));
     }
@@ -708,7 +709,12 @@ function gabungKeluargaBinaan_post(){
       'tgl_join'=>date_format(new DateTime(), 'Y-m-d'),
       'statusdata'=>0
     );
-    $this->GeneralApiModel->insertTransactional($insert, 'transactional_binaan');
+    $status = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk'=>$no_kk, 'id_pembina'=>$id_pembina, 'id_pelatihan'=>$id_pelatihan, 'id_kelas'=>$id_kelas), 'transactional_binaan')->row();
+    if ($count($status)>0) {
+      $this->response(array('status' => 200, 'message' => 'Anda sudah bergabung menjadi keluarga binaan!', 'data' => true));
+    } else {
+      $this->GeneralApiModel->insertTransactional($insert, 'transactional_binaan');
+    }
     $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi keluarga binaan!', 'data' => true));
   }else{
     $this->response(array('status' => 200, 'message' => 'Input tidak sesuai, silahkan cek format request input anda!', 'data' => false));
