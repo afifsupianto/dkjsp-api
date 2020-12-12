@@ -585,6 +585,14 @@ function homeKader_post(){
         'waktu'=>($aktivitas?$aktivitas->cdate:null),
         'is_sudah_isi_laporan'=>($aktivitas?($this->date_diff($aktivitas->cdate)==0?true:false):null)
       ),
+      'info_pembina'=> array(
+        "nama_pembina"=> $pembina->namalengkap,
+        "id_pembina"=> $pembina->id,
+        "nohp_pembina"=> $pembina->nohp,
+        "institusi_pembina"=> $pembina->nama_institusi,
+        "kabupaten_pembina"=> $pembina->nama_kota,
+        "provinsi_pembina"=> $pembina->nama_provinsi
+      ),
       'anggota_keluarga' => $list_anggota,
       'list_keluargabinaan' => $list_binaan,
       'list_kader' => $list_kader
@@ -627,7 +635,7 @@ function menu_post(){
       array_push($list_kader, array("nama_kader"=>$daftar->namalengkap, "kabupaten"=>$daftar->nama_kota, "provinsi"=>$daftar->nama_provinsi));
     }
 
-    $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user),'user_provinsi_kota')->result()[0];
+    $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_peserta),'user_provinsi_kota')->result()[0];
     $result = array(
       "nama_pembina"=> $pembina->namalengkap,
       "id_pembina"=> $pembina->id,
@@ -662,7 +670,7 @@ function cariRelawan_post(){
       $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
 
       if ($id_user==$kode->id_user) {
-        $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => true));
+        $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => null));
       } else {
         $result = array(
           'id_pembina'=>$kode->id_user,
@@ -670,7 +678,7 @@ function cariRelawan_post(){
           'id_pelatihan'=>$kode->id_pelatihan,
           'nama_pelatihan'=>$this->GeneralApiModel->getWhereMaster(array('id'=>$kode->id_pelatihan), 'masterdata_pelatihan')->row()->nama,
           'nama'=>$pembina->namalengkap,
-          'institusi'=>($kode->role==0?($pembina?$pembina->nama_institusi:null):'-'),
+          'institusi'=>($kode->role==0?($pembina?$pembina->nama_institusi:null):null),
           'kabupaten'=>($pembina?$pembina->nama_kota:null),
           'provinsi'=>($pembina?$pembina->nama_provinsi:null),
           'waktu_tunggu'=>$kode->cdate,
@@ -709,8 +717,8 @@ function gabungKeluargaBinaan_post(){
       'tgl_join'=>date_format(new DateTime(), 'Y-m-d'),
       'statusdata'=>0
     );
-    $status = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk'=>$no_kk, 'id_pembina'=>$id_pembina, 'id_pelatihan'=>$id_pelatihan, 'id_kelas'=>$id_kelas), 'transactional_binaan')->row();
-    if ($count($status)>0) {
+    $status = $this->GeneralApiModel->getWhereTransactional(array('nomor_kk'=>$no_kk, 'id_pembina'=>$id_pembina, 'id_pelatihan'=>$id_pelatihan, 'id_kelas'=>$id_kelas), 'transactional_binaan')->result();
+    if (count($status)>0) {
       $this->response(array('status' => 200, 'message' => 'Anda sudah bergabung menjadi keluarga binaan!', 'data' => true));
     } else {
       $this->GeneralApiModel->insertTransactional($insert, 'transactional_binaan');
