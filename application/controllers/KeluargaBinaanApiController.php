@@ -382,7 +382,7 @@ class KeluargaBinaanApiController extends REST_Controller{
     $id_user = $this->input->post('id_user');
     if(!empty($id_user)){
       $user = $this->GeneralApiModel->getOneWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result();
-      $role = $this->GeneralApiModel->getWhereTransactional(array('id_user'=>$id_user),'transactional_kode_referal')->row();
+      $role = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user),'transactional_user')->row();
 
       $result = array();
       foreach ($user as $u) {
@@ -486,7 +486,7 @@ class KeluargaBinaanApiController extends REST_Controller{
           'nama_pembina'=>$pembina->namalengkap,
           'id_pembina'=>$id_pembina,
           'nohp_pembina'=>$pembina->nohp,
-          'institusi_pembina'=>$pembina->nama_institusi,
+          'institusi'=>($pembina->role==0?($pembina?$pembina->nama_institusi:null):null),
           'kabupaten_pembina'=>$pembina->nama_kota,
           'provinsi_pembina'=>$pembina->nama_provinsi
         ),
@@ -589,7 +589,7 @@ function homeKader_post(){
         "nama_pembina"=> $pembina->namalengkap,
         "id_pembina"=> $pembina->id,
         "nohp_pembina"=> $pembina->nohp,
-        "institusi_pembina"=> $pembina->nama_institusi,
+        'institusi'=>($pembina->role==0?($pembina?$pembina->nama_institusi:null):null),
         "kabupaten_pembina"=> $pembina->nama_kota,
         "provinsi_pembina"=> $pembina->nama_provinsi
       ),
@@ -635,12 +635,12 @@ function menu_post(){
       array_push($list_kader, array("nama_kader"=>$daftar->namalengkap, "kabupaten"=>$daftar->nama_kota, "provinsi"=>$daftar->nama_provinsi));
     }
 
-    $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_peserta),'user_provinsi_kota')->result()[0];
+    $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_peserta),'user_provinsi_kota')->row();
     $result = array(
       "nama_pembina"=> $pembina->namalengkap,
       "id_pembina"=> $pembina->id,
       "nohp_pembina"=> $pembina->nohp,
-      "institusi_pembina"=> $pembina->nama_institusi,
+      'institusi'=>($pembina->role==0?($pembina?$pembina->nama_institusi:null):null),
       "kabupaten_pembina"=> $pembina->nama_kota,
       "provinsi_pembina"=> $pembina->nama_provinsi,
       'list_keluarga_binaan'=>$list_binaan,
