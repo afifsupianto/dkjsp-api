@@ -342,11 +342,12 @@ class KeluargaBinaanApiController extends REST_Controller{
     );
     if(($data['status_acc'] == 1) && $data['status_acc'] != ''){
       if(!empty($data['id_pembina'])){
-        $update_binaan = array(
-          'id_pembina' => $data['id_pembina'],
-        );
+        // $update_binaan = array(
+        //   'id_pembina' => $data['id_pembina'],
+        //   'status_acc' => $data['statu']
+        // );
 
-        $result = $this->GeneralApiModel->updateTransactional($update_binaan, $nomor_kk, 'transactional_binaan');
+        $result = $this->GeneralApiModel->updateTransactional($data, $nomor_kk, 'transactional_binaan');
         if($result){
           $this->response(array('status' => 200, 'message' => 'ACC Keluarga Binaan oleh Relawan telah Berhasil!', 'data' => $result));
         }
