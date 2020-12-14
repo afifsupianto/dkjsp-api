@@ -382,26 +382,26 @@ class KeluargaBinaanApiController extends REST_Controller{
 
     $id_user = $this->input->post('id_user');
     if(!empty($id_user)){
-      $user = $this->GeneralApiModel->getWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->row();
+      $user = $this->GeneralApiModel->getWhereTransactionalOrdered(array('id_user'=>$id_user),'id_user','DESC','dashboard_keluargabinaan')->result();
       $role = $this->GeneralApiModel->getWhereTransactional(array('id_user'=>$id_user),'transactional_kode_referal')->row();
 
-      // $result = array();
-      // foreach ($user as $u) {
-        $result = array(
-          'id_kelas'=>($user->id_kelas),
-          'id_pelatihan'=>($user->id_pelatihan),
-          'id_pembina'=>($user->id_pembina),
-          'nama_pelatihan'=>($user->nama),
-          'deskripsi_pelatihan'=>($user->deskripsi),
-          'nama_pembina'=>($user->nama_pembina),
-          'periode_kelas'=>array('tgl_buka'=>($user->tgl_buka), 'tgl_selesai'=>($user->tgl_selesai)),
-          'status_kelas'=>($user->status_kelas),
+      $result = array();
+      foreach ($user as $u) {
+        $push = array(
+          'id_kelas'=>($u->id_kelas),
+          'id_pelatihan'=>($u->id_pelatihan),
+          'id_pembina'=>($u->id_pembina),
+          'nama_pelatihan'=>($u->nama),
+          'deskripsi_pelatihan'=>($u->deskripsi),
+          'nama_pembina'=>($u->nama_pembina),
+          'periode_kelas'=>array('tgl_buka'=>($u->tgl_buka), 'tgl_selesai'=>($u->tgl_selesai)),
+          'status_kelas'=>($u->status_kelas),
           'status_role'=>(!empty($role->kode_referal)?"Keluarga Binaan":"Kader"),
-          'status_acc'=>($user->status_acc),
-          'cdate'=>($user->cdate),
+          'status_acc'=>($u->status_acc),
+          'cdate'=>($u->cdate),
         );
-      //   array_push($result, $push);
-      // }
+        array_push($result, $push);
+      }
 
       $this->response(array('status' => 200, 'message' => 'Data berhasil didapatkan', 'data' => $result));
     } else {
