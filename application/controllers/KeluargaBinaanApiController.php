@@ -396,7 +396,7 @@ class KeluargaBinaanApiController extends REST_Controller{
           'nama_pembina'=>($u->nama_pembina),
           'periode_kelas'=>array('tgl_buka'=>($u->tgl_buka), 'tgl_selesai'=>($u->tgl_selesai)),
           'status_kelas'=>($u->status_kelas),
-          'status_role'=>(!empty($role->kode_referal)?"Keluarga Binaan":"Kader"),
+          'status_role'=>(empty($role->kode_referal)?"Keluarga Binaan":"Kader"),
           'status_acc'=>($u->status_acc),
           'cdate'=>($u->cdate),
         );
