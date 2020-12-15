@@ -120,7 +120,8 @@ class UserApiController extends REST_Controller {
       $no_hp = $this->input->post('no_hp');
       $alamat = $this->input->post('alamat');
 
-      if (!empty($id_user) && !empty($namalengkap) && !empty($email) && !empty($no_hp) && !empty($alamat)) {
+      // if (!empty($id_user) && !empty($namalengkap) && !empty($email) && !empty($no_hp) && !empty($alamat)) {
+      if (!empty($id_user)) {
         $this->GeneralApiModel->updateTransactional(array('namalengkap'=>$namalengkap, 'nohp'=>$no_hp, 'email'=>$email),array('id'=>$id_user),'transactional_user');
         if (!empty($nik)) {
           $this->GeneralApiModel->updateTransactional(array('nik_anggota'=>$nik),array('id_user'=>$id_user),'transactional_anggota_keluarga');
