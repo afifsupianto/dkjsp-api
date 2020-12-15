@@ -134,21 +134,23 @@ class UserApiController extends REST_Controller {
 
     function gantiPassword_post(){
       $id_user = $this->input->post('id_user');
-      $new_password = password_hash($this->input->post('new'), PASSWORD_DEFAULT);
+      $new_password = $this->input->post('new');
       $conf_password = $this->input->post('conf');
       $old_password = $this->input->post('old');
+      // $old_password = password_hash($this->input->post('old'), PASSWORD_DEFAULT);
 
       if (!empty($id_user) && !empty($new_password) && !empty($conf_password) && !empty($old_password)) {
         $user = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user),'transactional_user')->row();
-        if (password_verify($user->password, password_hash($old_password, PASSWORD_DEFAULT))) {
+        if (password_verify($old_password, $user->password)) {
             if ($new_password==$conf_password) {
-              $this->GeneralApiModel->updateTransactional(array('password'=>password_hash($new_password, PASSWORD_DEFAULT)),array('id'=>$id_user),'transactional_user');
+              $new_password = password_hash($this->input->post('new'), PASSWORD_DEFAULT);
+              $this->GeneralApiModel->updateTransactional(array('password'=>$new_password),array('id'=>$id_user),'transactional_user');
               $this->response(array('status' => 200, 'message' => 'Password Berhasil Diubah', 'data' => true));
             } else {
               $this->response(array('status' => 200, 'message' => 'Password Baru dan Konfirmasi Tidak Sama!', 'data' => false));
             }
         } else {
-            $this->response(array('status' => 200, 'message' => 'Password Lama Anda Salah!', 'data' => false));
+            $this->response(array('status' => 200, 'message' => 'Password Lama Anda Salah!', 'data' => array("database"=>$user->password, "input"=>$old_password)));
         }
       } else {
         $this->response(array('status' => 200, 'message' => 'Data Tidak Lengkap', 'data' => false));
