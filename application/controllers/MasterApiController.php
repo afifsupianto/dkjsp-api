@@ -39,12 +39,12 @@ class MasterApiController extends REST_Controller {
         $list_pertanyaan = array();
         if(!empty($faq)){
             foreach ($faq as $f) {
-              $list_pertanyaan = array();
+            //   $list_pertanyaan = array();
               $pertanyaan = $this->GeneralApiModel->getWhereMaster(array('id_kategori'=>$f->id), 'masterdata_faq')->result();
-              foreach ($pertanyaan as $p) {
-                array_push($list_pertanyaan, array('id'=>$p->id, 'pertanyaan'=>$pertanyaan));
-              }
-              array_push($result, array('kategori'=>$f->kategori, 'list_pertanyaan'=>$list_pertanyaan));
+            //   foreach ($pertanyaan as $p) {
+            //     array_push($list_pertanyaan, array('id'=>$p->id, 'pertanyaan'=>$pertanyaan));
+            //   }
+              array_push($result, array('kategori'=>$f->kategori, 'list_pertanyaan'=>$pertanyaan));
             }
             $this->response(array('status' => 200, 'message' => 'Data Berhasil Ditemukan!', 'data' => $result));
         } else {
