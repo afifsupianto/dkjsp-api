@@ -432,7 +432,7 @@ class KeluargaBinaanApiController extends REST_Controller{
 
         $detail = $detail[0];
         $id_pembina = $detail->id_pembina;
-        $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_pembina),'user_provinsi_kota')->result()[0];
+        $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_pembina),'semua_anggota_keluarga')->result()[0];
 
         $kk = $detail->nomor_kk;
 
