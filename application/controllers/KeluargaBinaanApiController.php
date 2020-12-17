@@ -663,30 +663,38 @@ function cariRelawan_post(){
   $id_user = $this->input->post('id_user');
   if(!empty($kode_referal) && !empty($id_user)){
     $kode = $this->GeneralApiModel->getWhereTransactional(array('kode_referal'=>$kode_referal), 'transactional_kode_referal')->result();
-
     if(count($kode)>0){
       $kode = $kode[0];
+
       $pembina = $this->GeneralApiModel->getWhereTransactional(array('id'=>$kode->id_user),'detail_alamat')->result();
       $pembina = $pembina?$pembina[0]:null;
-      $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
 
-      if ($id_user==$kode->id_user) {
-        $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => null));
+      $status_kelas = $this->GeneralApiModel->getWhereTransactional(array('id_kelas'=>$kode->id_kelas, 'id_pelatihan'=>$kode->id_pelatihan),'kelas_pelatihan')->row()->status_kelas;
+      if ($status_kelas==1 || $status_kelas==2) {
+          if ($id_user==$kode->id_user) {
+            $this->response(array('status' => 200, 'message' => 'Pembina tidak bisa bergabung!', 'data' => null));
+          } else {
+            $result = array(
+              'id_pembina'=>$kode->id_user,
+              'id_kelas'=>$kode->id_kelas,
+              'id_pelatihan'=>$kode->id_pelatihan,
+              'nama_pelatihan'=>$this->GeneralApiModel->getWhereMaster(array('id'=>$kode->id_pelatihan), 'masterdata_pelatihan')->row()->nama,
+              'nama'=>$pembina->namalengkap,
+              'institusi'=>($kode->role==0?($pembina?$pembina->nama_institusi:null):null),
+              'kabupaten'=>($pembina?$pembina->nama_kota:null),
+              'provinsi'=>($pembina?$pembina->nama_provinsi:null),
+              'waktu_tunggu'=>$kode->cdate,
+              'tgl_join'=>$kode->tgl_join,
+              'status_kelas'=>$status_kelas
+            );
+            $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
+          }
       } else {
-        $result = array(
-          'id_pembina'=>$kode->id_user,
-          'id_kelas'=>$kode->id_kelas,
-          'id_pelatihan'=>$kode->id_pelatihan,
-          'nama_pelatihan'=>$this->GeneralApiModel->getWhereMaster(array('id'=>$kode->id_pelatihan), 'masterdata_pelatihan')->row()->nama,
-          'nama'=>$pembina->namalengkap,
-          'institusi'=>($kode->role==0?($pembina?$pembina->nama_institusi:null):null),
-          'kabupaten'=>($pembina?$pembina->nama_kota:null),
-          'provinsi'=>($pembina?$pembina->nama_provinsi:null),
-          'waktu_tunggu'=>$kode->cdate,
-          'tgl_join'=>$kode->tgl_join,
-          'status_kelas'=>$status_kelas
-        );
-        $this->response(array('status' => 200, 'message' => 'Anda berhasil bergabung menjadi kader!', 'data' => $result));
+        if ($status_kelas==0) {
+          $this->response(array('status' => 200, 'message' => 'Kelas belum dibuka!', 'data' => false));
+        }else {
+          $this->response(array('status' => 200, 'message' => 'Kelas sudah selesai!', 'data' => false));
+        }
       }
     } else {
       $this->response(array('status' => 200, 'message' => 'Kode referal tidak ditemukan!', 'data' => false));
