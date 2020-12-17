@@ -628,7 +628,7 @@ function menu_post(){
       array_push($list_binaan, array("nama_kepala"=>$daftar->namalengkap, "kabupaten"=>$daftar->nama_kota, "provinsi"=>$daftar->nama_provinsi));
     }
 
-    $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan,"id_kelas"=>$id_kelas, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
+    $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_peserta, "id_pelatihan"=>$id_pelatihan,"id_kelas"=>$id_kelas, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
     // $kader = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "role"=>1), "cdate", "ASC", " transactional_kode_referal")->result();
     foreach ($kader as $b) {
       // $id_user = $b->id_user;
