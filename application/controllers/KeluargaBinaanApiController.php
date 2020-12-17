@@ -620,7 +620,7 @@ function menu_post(){
   if(!empty($id_user)){
     $list_binaan = array();
     $list_kader = array();
-    $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user, "id_pelatihan"=>$id_pelatihan, "id_kelas"=>$id_kelas), "cdate", "ASC", " transactional_binaan")->result();
+    $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_peserta, "id_pelatihan"=>$id_pelatihan, "id_kelas"=>$id_kelas), "cdate", "ASC", " transactional_binaan")->result();
     // $binaan = $this->GeneralApiModel->getWhereTransactionalOrdered(array("id_pembina"=>$id_user), "cdate", "ASC", " transactional_binaan")->result();
     foreach ($binaan as $b) {
       $no_kk = $b->nomor_kk;
