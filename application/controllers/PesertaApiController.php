@@ -562,10 +562,10 @@ class PesertaApiController extends REST_Controller
             $pre = $pre_benar==0?0:number_format(($pre_benar/$pre_soal)*100,2);
             $post = $post_benar==0?0:number_format(($post_benar/$post_soal)*100,2);
 
-            $data['nilai_pretest'] = $pre;
-            $data['nilai_posttest'] = $post;
-            $data['tgl_pretest'] = $tgl_pre;
-            $data['tgl_posttest'] = $tgl_post;
+            $data['nilai_pretest'] = "$pre";
+            $data['nilai_posttest'] = "$post";
+            $data['tgl_pretest'] = "$tgl_pre";
+            $data['tgl_posttest'] = "$tgl_post";
             $this->response(array('status' => 200, 'message' => 'data diterima', 'data' => $data));
           }else{
             $this->response(array('status' => 200, 'message' => 'pencarian kelas berdasarkan id tidak ditemukan', 'data' => null));
