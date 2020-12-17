@@ -53,13 +53,16 @@ class AktivitasApiController extends REST_Controller {
             $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => false));
           }
         }
-
-        $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => ($list_aktivitas?$list_aktivitas[0]:null)));
+        if ($list_aktivitas) {
+          $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => ($list_aktivitas?$list_aktivitas[0])));
+        } else {
+          $this->response(array('status' => 200, 'message' => 'Data ID Grading Aktivitas tidak ditemukan', 'data' => false));
+        }
       }else{
-        $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => null));
+        $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => false));
       }
     }else{
-      $this->response(array('status' => 200, 'message' => 'Masukkan id user terlebih dahulu! data tidak ditemukan', 'data' => null));
+      $this->response(array('status' => 200, 'message' => 'Masukkan id user terlebih dahulu! data tidak ditemukan', 'data' => false));
     }
   }
 
