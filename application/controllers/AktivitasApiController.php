@@ -28,36 +28,43 @@ class AktivitasApiController extends REST_Controller {
     // $id_grading = 1;
 
     if(!empty($user['id'])){
-      $user = $this->GeneralApiModel->getWhereTransactional($user, "user_provinsi_kota")->row();
+      $user = $this->GeneralApiModel->getWhereTransactional($user, "transactional_user")->row();
       if(!empty($user)){
         $aktivitas = $this->GeneralApiModel->getWhereMaster(array('id_grading'=>$id_grading), "masterdata_aktivitas")->result();
 
-        $list_aktivitas = array();
-        $list_soal = array();
-        $list_jawaban = array();
+        if (count($aktivitas)>0) {
+          $list_aktivitas = array();
+          $list_soal = array();
+          $list_jawaban = array();
 
-        foreach ($aktivitas as $kd => $vd) {
-          $soal = $this->GeneralApiModel->getWhereMaster(array('id_aktivitas'=>$vd->id), "masterdata_soal_aktivitas")->result();
-          if (count($soal)>0) {
-            foreach ($soal as $ks => $vs) {
-              $jawaban = $this->GeneralApiModel->getWhereMaster(array('id_soal'=>$vs->id), "masterdata_pilihan_jawaban_aktivitas")->result();
-              foreach ($jawaban as $kj => $vj) {
-                array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
+          foreach ($aktivitas as $kd => $vd) {
+            $soal = $this->GeneralApiModel->getWhereMaster(array('id_aktivitas'=>$vd->id), "masterdata_soal_aktivitas")->result();
+            if (count($soal)>0) {
+              foreach ($soal as $ks => $vs) {
+                $jawaban = $this->GeneralApiModel->getWhereMaster(array('id_soal'=>$vs->id), "masterdata_pilihan_jawaban_aktivitas")->result();
+
+                foreach ($jawaban as $kj => $vj) {
+                  array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
+                }
+                array_push($list_soal, array("id_soal"=>$vs->id, "soal"=>$vs->soal, "tipe"=>$vs->tipe, "data_jawaban"=>$list_jawaban));
+                $list_jawaban = array();
               }
-              array_push($list_soal, array("id_soal"=>$vs->id, "soal"=>$vs->soal, "tipe"=>$vs->tipe, "data_jawaban"=>$list_jawaban));
-              $list_jawaban = array();
+              array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>$vd->nama, "list_soal"=>$list_soal));
+              $list_soal = array();
+            } else {
+              $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => false));
             }
-            array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>$vd->nama, "list_soal"=>$list_soal));
-            $list_soal = array();
-          } else {
-            $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => false));
           }
-        }
-        if ($list_aktivitas) {
-          $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => ($list_aktivitas?$list_aktivitas[0])));
+
+          if ($list_aktivitas) {
+            $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => $list_aktivitas));
+          } else {
+            $this->response(array('status' => 200, 'message' => 'Data Grading masih kosong!', 'data' => false));
+          }
         } else {
-          $this->response(array('status' => 200, 'message' => 'Data ID Grading Aktivitas tidak ditemukan', 'data' => false));
+          $this->response(array('status' => 200, 'message' => 'Data Aktivitas Belum Ada', 'data' => false));
         }
+
       }else{
         $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => false));
       }
