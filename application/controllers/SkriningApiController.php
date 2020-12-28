@@ -111,7 +111,7 @@ class SkriningApiController extends REST_Controller {
       }
 
       // DEMOGRAFI DAN FISIK
-      $fisik = 0;
+      $fisik = 1;
 
       // ORANG SEHAT
       $sehat = array(38,48,52,54,56);
@@ -191,7 +191,7 @@ class SkriningApiController extends REST_Controller {
       }
 
 
-      $psikososial = 0;
+      $psikososial = 1;
       // PSIKOSOSIAL
       if ($bulan > 180) {
         $satu_duapuluh = range(64,102,2);
