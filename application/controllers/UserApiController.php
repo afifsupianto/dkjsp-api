@@ -151,7 +151,7 @@ class UserApiController extends REST_Controller {
               $this->response(array('status' => 200, 'message' => 'Password Baru dan Konfirmasi Tidak Sama!', 'data' => false));
             }
         } else {
-            $this->response(array('status' => 200, 'message' => 'Password Lama Anda Salah!', 'data' => array("database"=>$user->password, "input"=>$old_password)));
+            $this->response(array('status' => 200, 'message' => 'Password Lama Anda Salah!', 'data' => false));
         }
       } else {
         $this->response(array('status' => 200, 'message' => 'Data Tidak Lengkap', 'data' => false));
