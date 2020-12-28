@@ -42,12 +42,15 @@ class AktivitasApiController extends REST_Controller {
             if (count($soal)>0) {
               foreach ($soal as $ks => $vs) {
                 $jawaban = $this->GeneralApiModel->getWhereMaster(array('id_soal'=>$vs->id), "masterdata_pilihan_jawaban_aktivitas")->result();
-
-                foreach ($jawaban as $kj => $vj) {
-                  array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
+                if (count($jawaban)>0) {
+                  foreach ($jawaban as $kj => $vj) {
+                    array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
+                  }
+                  array_push($list_soal, array("id_soal"=>$vs->id, "soal"=>$vs->soal, "tipe"=>$vs->tipe, "data_jawaban"=>$list_jawaban));
+                  $list_jawaban = array();
+                }else {
+                  $this->response(array('status' => 200, 'message' => 'Data Jawaban Belum Diisi', 'data' => null));
                 }
-                array_push($list_soal, array("id_soal"=>$vs->id, "soal"=>$vs->soal, "tipe"=>$vs->tipe, "data_jawaban"=>$list_jawaban));
-                $list_jawaban = array();
               }
               array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>$vd->nama, "list_soal"=>$list_soal));
               $list_soal = array();
