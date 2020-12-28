@@ -192,7 +192,7 @@ class AuthApiModel extends CI_Model{
             $query = $this->db->get_where('user_anggotakeluarga_detail', $data);
         }
         //jika role adalah admin 2
-        elseif($data['role'] == 2 || $data['role'] == 3 $data['role'] == 4){
+        elseif($data['role'] == 2 || $data['role'] == 3 || $data['role'] == 4){
             $query = $this->db->get_where('user_panitia_detail', $data);
         }
         // elseif($data['role'] == 3){
