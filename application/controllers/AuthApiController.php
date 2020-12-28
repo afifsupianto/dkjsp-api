@@ -154,7 +154,7 @@ class AuthApiController extends REST_Controller
                     //Data Kepala Keluarga
                     $data_keluargabinaan = array(
                         'nomor_kk' => $this->input->post('nomor_kk'),
-                        'id_pembina' => 0,
+                        // 'id_pembina' => 0,
                     );
                     $result = $this->AuthApiModel->insertKepalaKeluargaBinaan($data_user, $data_keluargabinaan, $data_anggota, $data_alamat);
                     if (!empty($result)) {
