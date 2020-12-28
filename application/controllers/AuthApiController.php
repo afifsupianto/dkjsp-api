@@ -225,26 +225,23 @@ class AuthApiController extends REST_Controller
                 $this->response(array('status' => 200, 'message' => 'No. HP Telah Terdaftar!', 'data' => null));
             }
         }else{
-            $result = $this->AuthApiModel->insertPanitia($data_user, $data_alamat); //return id yg terdaftar
-            if (!empty($result)) {
+            $id = $this->AuthApiModel->insertPanitia($data_user, $data_alamat); //return id yg terdaftar
+            if (!empty($id)) {
                 $view = array(
-                    'id' => $result,
+                    'id' => $id,
                     'role' => $data_user['role']
                 );
                 $result2 = $this->AuthApiModel->getViewByRole($view)->result();
                 if(!empty($result2)){
                     if($view['role'] == 2){
                         $message = "Registrasi anda sebagai panitia admin telah berhasil!";
-                    }
-                    elseif($view['role'] == 3){
+                    }elseif($view['role'] == 3){
                         $message = "Registrasi anda sebagai panitia operator telah berhasil!";
-                    }
-                    elseif($view['role'] == 4){
+                    }elseif($view['role'] == 4){
                         $message = "Registrasi anda sebagai panitia pemateri telah berhasil!";
                     }
                     $this->response(array('status' => 200, 'message' => $message, 'data' => $result2[0]));
-                }
-                else{
+                }else{
                     $this->response(array('status' => 200, 'message' => 'Data pada DB view tidak tersedia', 'data' => null));
                 }
             }

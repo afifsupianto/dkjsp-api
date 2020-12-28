@@ -3,7 +3,7 @@
 class AuthApiModel extends CI_Model{
 
     function loginByEmail($data){
-        //kasih if else; jika role 0, panggil view ... jika role 1, panggil view ... 
+        //kasih if else; jika role 0, panggil view ... jika role 1, panggil view ...
         $query = $this->db->get_where('transactional_user',array('email' => $data['user']));
         return $query;
     }
@@ -56,8 +56,7 @@ class AuthApiModel extends CI_Model{
 
         if ($status === FALSE){
             $this->db->trans_rollback();
-        }
-        else{
+        }else{
             $data_alamat['id_user'] = $id_user;
             $this->db->insert('transactional_alamat', $data_alamat);
             $status = $this->db->trans_status();
@@ -193,15 +192,15 @@ class AuthApiModel extends CI_Model{
             $query = $this->db->get_where('user_anggotakeluarga_detail', $data);
         }
         //jika role adalah admin 2
-        elseif($data['role'] == 2){
-            $query = $this->db->get_where('user_admin_detail', $data);
+        elseif($data['role'] == 2 || $data['role'] == 3 $data['role'] == 4){
+            $query = $this->db->get_where('user_panitia_detail', $data);
         }
-        elseif($data['role'] == 3){
-            $query = $this->db->get_where('user_operator_detail', $data);
-        }
-        elseif($data['role'] == 4){
-            $query = $this->db->get_where('user_pemateri_detail', $data);
-        }
+        // elseif($data['role'] == 3){
+        //     $query = $this->db->get_where('user_operator_detail', $data);
+        // }
+        // elseif($data['role'] == 4){
+        //     $query = $this->db->get_where('user_pemateri_detail', $data);
+        // }
         return $query;
     }
 }
