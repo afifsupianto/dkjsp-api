@@ -49,30 +49,30 @@ class AktivitasApiController extends REST_Controller {
                   array_push($list_soal, array("id_soal"=>$vs->id, "soal"=>$vs->soal, "tipe"=>$vs->tipe, "data_jawaban"=>$list_jawaban));
                   $list_jawaban = array();
                 }else {
-                  $this->response(array('status' => 200, 'message' => 'Data Jawaban Belum Diisi', 'data' => null));
+                  $this->response(array('status' => 200, 'message' => 'Data Jawaban Belum Diisi', 'data' => false));
                 }
               }
               array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>$vd->nama, "list_soal"=>$list_soal));
               $list_soal = array();
             } else {
-              $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => null));
+              $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => false));
             }
           }
 
           if ($list_aktivitas) {
             $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => $list_aktivitas));
           } else {
-            $this->response(array('status' => 200, 'message' => 'Data Grading masih kosong!', 'data' => null));
+            $this->response(array('status' => 200, 'message' => 'Data Grading masih kosong!', 'data' => false));
           }
         } else {
-          $this->response(array('status' => 200, 'message' => 'Data Aktivitas Belum Ada', 'data' => null));
+          $this->response(array('status' => 200, 'message' => 'Data Aktivitas Belum Ada', 'data' => false));
         }
 
       }else{
-        $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => null));
+        $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => false));
       }
     }else{
-      $this->response(array('status' => 200, 'message' => 'Masukkan id user terlebih dahulu! data tidak ditemukan', 'data' => null));
+      $this->response(array('status' => 200, 'message' => 'Masukkan id user terlebih dahulu! data tidak ditemukan', 'data' => false));
     }
   }
 
