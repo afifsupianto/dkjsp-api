@@ -25,72 +25,72 @@ class SkriningApiController extends REST_Controller {
 
     if(!empty($id_pelatihan) && !empty($id_user)){
       $skrining = $this->GeneralApiModel->getWhereMaster(array('id_pelatihan'=>$id_pelatihan), "masterdata_skrining")->result();
-      if (count($skrining)>0) {        
+      if (count($skrining)>0) {
         $id_skrining = $this->GeneralApiModel->getWhereMaster(array('id_pelatihan'=>$id_pelatihan), "masterdata_skrining")->row()->id;
-
-        $result = $this->GeneralApiModel->getWhereMaster(array('id'=>$id_skrining), "masterdata_skrining")->row();
-        $user = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user), "user_provinsi_kota")->row();
-        if(!empty($user)){
-          $data = array(
-            'id' => $id_skrining,
-            'nama' => $result->nama
-          );
-
-          $data['sub_skrining'] = array();
-          // $where2 = array('id_skrining' => ($kondisi?$kondisi->id_skrining:0));
-          $where2 = array('id_skrining' => $id_skrining);
-          $result2 = $this->GeneralApiModel->getWhereMaster($where2, "masterdata_sub_skrining")->result();
-
-          $i = 0;
-          $umur = $user->umur;
-          foreach($result2 as $row){
-            if($umur < 15 && $i > 1){
-              break;
-            }else{
-              $data['sub_skrining'][$i]['id'] = $row->id;
-              $data['sub_skrining'][$i]['nama'] = $row->nama;
-              $data['sub_skrining'][$i]['deskripsi'] = $row->deskripsi;
-              $data['sub_skrining'][$i]['soal_skrining'] = array();
-
-              $where3 = array(
-                'id_sub_skrining' => $row->id,
-                'is_child' => 0
-              );
-              $result3 = $this->GeneralApiModel->getWhereMaster($where3, "masterdata_soal_skrining")->result();
-              $j = 0;
-
-              foreach($result3 as $row){
-                $data['sub_skrining'][$i]['soal_skrining'][$j]['id'] = $row->id;
-                $data['sub_skrining'][$i]['soal_skrining'][$j]['soal'] = $row->soal;
-                $data['sub_skrining'][$i]['soal_skrining'][$j]['tipe'] = $row->tipe;
-                $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'] = array();
-
-                $where4 = array('id_soal' => $row->id);
-                $result4 = $this->GeneralApiModel->getWhereMaster($where4, "masterdata_pilihan_jawaban_skrining")->result();
-                $k = 0;
-                foreach($result4 as $row){
-                  $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['id'] = $row->id;
-                  $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['jawaban'] = $row->jawaban;
-                  if($row->id_child_soal != 0){
-                    $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['anak_pertanyaan'] = $this->SkriningApiModel->recursiveAnakSoal(array(), $row->id_child_soal);
-                  }else{
-                    $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['anak_pertanyaan'] = null;
-                  }
-                  $k++;
-                }
-
-                $j++;
-              }
-              $i++;
-            }
-          }
-
-          $this->response(array('status' => 200, 'message' => 'respond test', 'data' => $data));
-        } else {
-          $this->response(array('status' => 200, 'message' => 'Data skrining atau Data User tidak ditemukan', 'data' => null));
-        }
       } else {
-        $this->response(array('status' => 200, 'message' => 'Pelatihan tidak memiliki Data Skrining', 'data' => null));
+        $id_skrining = 1;
+        // $this->response(array('status' => 200, 'message' => 'Pelatihan tidak memiliki Data Skrining', 'data' => null));
+      }
+      $result = $this->GeneralApiModel->getWhereMaster(array('id'=>$id_skrining), "masterdata_skrining")->row();
+      $user = $this->GeneralApiModel->getWhereTransactional(array('id'=>$id_user), "user_provinsi_kota")->row();
+      if(!empty($user)){
+        $data = array(
+          'id' => $id_skrining,
+          'nama' => $result->nama
+        );
+
+        $data['sub_skrining'] = array();
+        // $where2 = array('id_skrining' => ($kondisi?$kondisi->id_skrining:0));
+        $where2 = array('id_skrining' => $id_skrining);
+        $result2 = $this->GeneralApiModel->getWhereMaster($where2, "masterdata_sub_skrining")->result();
+
+        $i = 0;
+        $umur = $user->umur;
+        foreach($result2 as $row){
+          if($umur < 15 && $i > 1){
+            break;
+          }else{
+            $data['sub_skrining'][$i]['id'] = $row->id;
+            $data['sub_skrining'][$i]['nama'] = $row->nama;
+            $data['sub_skrining'][$i]['deskripsi'] = $row->deskripsi;
+            $data['sub_skrining'][$i]['soal_skrining'] = array();
+
+            $where3 = array(
+              'id_sub_skrining' => $row->id,
+              'is_child' => 0
+            );
+            $result3 = $this->GeneralApiModel->getWhereMaster($where3, "masterdata_soal_skrining")->result();
+            $j = 0;
+
+            foreach($result3 as $row){
+              $data['sub_skrining'][$i]['soal_skrining'][$j]['id'] = $row->id;
+              $data['sub_skrining'][$i]['soal_skrining'][$j]['soal'] = $row->soal;
+              $data['sub_skrining'][$i]['soal_skrining'][$j]['tipe'] = $row->tipe;
+              $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'] = array();
+
+              $where4 = array('id_soal' => $row->id);
+              $result4 = $this->GeneralApiModel->getWhereMaster($where4, "masterdata_pilihan_jawaban_skrining")->result();
+              $k = 0;
+              foreach($result4 as $row){
+                $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['id'] = $row->id;
+                $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['jawaban'] = $row->jawaban;
+                if($row->id_child_soal != 0){
+                  $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['anak_pertanyaan'] = $this->SkriningApiModel->recursiveAnakSoal(array(), $row->id_child_soal);
+                }else{
+                  $data['sub_skrining'][$i]['soal_skrining'][$j]['list_jawaban'][$k]['anak_pertanyaan'] = null;
+                }
+                $k++;
+              }
+
+              $j++;
+            }
+            $i++;
+          }
+        }
+
+        $this->response(array('status' => 200, 'message' => 'respond test', 'data' => $data));
+      } else {
+        $this->response(array('status' => 200, 'message' => 'Data skrining atau Data User tidak ditemukan', 'data' => null));
       }
     }else{
       $this->response(array('status' => 200, 'message' => 'Masukkan id pelatihan & id user terlebih dahulu! data tidak ditemukan', 'data' => null));
@@ -264,18 +264,18 @@ class SkriningApiController extends REST_Controller {
   }
 
   function getAge($date){
-    $dob = new DateTime($date);
-    $now = new DateTime();
+       $dob = new DateTime($date);
+       $now = new DateTime();
 
-    $datetime1 = date_create($dob->format('Y-m-d'));
-    $datetime2 = date_create($now->format('Y-m-d'));
+       $datetime1 = date_create($dob->format('Y-m-d'));
+       $datetime2 = date_create($now->format('Y-m-d'));
 
-    $interval = date_diff($datetime1, $datetime2);
+       $interval = date_diff($datetime1, $datetime2);
 
-    $month= $interval->format('%m');
-    $year= $interval->format('%y');
-    $total = ($year*12) + $month;
+       $month= $interval->format('%m');
+       $year= $interval->format('%y');
+       $total = ($year*12) + $month;
 
-    return $total;
-  }
+       return $total;
+   }
 }
