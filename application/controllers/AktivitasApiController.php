@@ -39,24 +39,24 @@ class AktivitasApiController extends REST_Controller {
 
           foreach ($aktivitas as $kd => $vd) {
             $soal = $this->GeneralApiModel->getWhereMaster(array('id_aktivitas'=>$vd->id), "masterdata_soal_aktivitas")->result();
-            // if (count($soal)>0) {
+            if (count($soal)>0) {
               foreach ($soal as $ks => $vs) {
                 $jawaban = $this->GeneralApiModel->getWhereMaster(array('id_soal'=>$vs->id), "masterdata_pilihan_jawaban_aktivitas")->result();
-                // if (count($jawaban)>0) {
+                if (count($jawaban)>0) {
                   foreach ($jawaban as $kj => $vj) {
                     array_push($list_jawaban, array("id_jawaban"=>$vj->id, "jawaban"=>$vj->jawaban));
                   }
                   array_push($list_soal, array("id_soal"=>$vs->id, "soal"=>$vs->soal, "tipe"=>$vs->tipe, "data_jawaban"=>$list_jawaban));
                   $list_jawaban = array();
-                // }else {
-                //   $this->response(array('status' => 200, 'message' => 'Data Jawaban Belum Diisi', 'data' => $list_jawaban));
-                // }
+                }else {
+                  $this->response(array('status' => 200, 'message' => 'Data Jawaban Belum Diisi', 'data' => $list_jawaban));
+                }
               }
               array_push($list_aktivitas, array("id_aktivitas"=>$vd->id, "nama"=>$vd->nama, "list_soal"=>$list_soal));
               $list_soal = array();
-            // } else {
-            //   $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => $list_soal));
-            // }
+            } else {
+              $this->response(array('status' => 200, 'message' => 'Data Soal Belum Diisi', 'data' => $list_soal));
+            }
           }
 
           $this->response(array('status' => 200, 'message' => 'Sukses', 'data' => $list_aktivitas));
@@ -67,6 +67,7 @@ class AktivitasApiController extends REST_Controller {
         } else {
           $this->response(array('status' => 200, 'message' => 'Data Aktivitas Belum Ada', 'data' => null));
         }
+
       }else{
         $this->response(array('status' => 200, 'message' => 'Data User tidak ditemukan', 'data' => null));
       }
